@@ -1,6 +1,6 @@
 // かんじ れんしゅうちょう — オフライン用 Service Worker
-const VERSION = 'kk10-v1';
-const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png'];
+const VERSION = 'kk-70903488';
+const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon-180.png", "./icon-192.png", "./icon-512.png", "./data/k10.json", "./data/k9.json", "./data/k8.json", "./data/k7.json", "./data/k6.json", "./data/k5.json", "./data/k4.json", "./data/k3.json"];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
