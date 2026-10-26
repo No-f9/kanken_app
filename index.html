@@ -127,6 +127,54 @@ button:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--sky);outli
 .zent .sx{font-weight:800}.zent .sx.m{color:#3C78D2}.zent .sx.f{color:#E25A82}.zent .sx.s{color:#C98A10}.zent .sx.b{color:#D9901E;font-size:14px}
 
 /* ---------- ホーム ---------- */
+.todayhead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.slots{display:flex;gap:8px}
+.slot{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:999px;font-size:16px;font-weight:800;border:2px solid var(--grid);color:var(--ink2);background:#fff}
+.slot svg{width:16px;height:16px}
+.slot small{font-size:12px;margin-left:4px}
+.slot.now{border-color:var(--cover);color:var(--cover);background:#E3F1E8}
+.slot.fin{background:var(--cover);border-color:var(--cover);color:#fff}
+.slot.past{opacity:.45}
+.trow{display:flex;align-items:center;gap:22px}
+.tinfo{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
+.tinfo .meta{font-size:18px}
+.tleft{font-size:20px;font-weight:800;color:var(--red)}
+.tleft b{font-size:36px;margin:0 3px}
+.tt{display:inline-block;flex:none;border-radius:50%}
+.tt svg{display:block;width:100%;height:100%}
+.tt.big{width:150px;height:150px;filter:drop-shadow(0 3px 0 rgba(0,0,0,.12))}
+.tt.mini{width:50px;height:50px}
+.tt.up{animation:ttup 1s ease-in-out infinite}
+@keyframes ttup{50%{transform:scale(1.1)}}
+.inf{font-size:32px;font-weight:900;line-height:1}
+.endless-card{display:flex;align-items:center;gap:14px;padding:16px 22px}
+.endless-card>div{flex:1;min-width:0}
+.endless-card h3{margin:0;font-size:20px;display:flex;align-items:center;gap:8px}
+.endless-card p{margin:2px 0 0;font-size:15px;font-weight:700;color:var(--ink2)}
+.endless-card>svg{width:26px;height:26px;flex:none;color:var(--ink2)}
+.endless-card.open{background:#FFF6DA;border-color:var(--gold)}
+.endless-card.open .inf{color:#B7790A}
+.endless-card .new{background:var(--red);color:#fff;font-size:13px;border-radius:999px;padding:2px 8px}
+.dots{display:flex;gap:5px;flex:none}
+.dots i{width:16px;height:16px;border-radius:50%;border:2px solid var(--rule)}
+.dots i.on{background:var(--gold);border-color:var(--gold)}
+.endless-tag{flex:1;display:flex;align-items:center;gap:12px;font-size:22px;font-weight:900;color:var(--cover)}
+.endless-tag .muted{font-size:18px}.endless-tag b{font-size:24px;margin-right:2px}
+.tkc{position:relative;display:inline-flex;align-items:center;gap:6px;padding:5px 14px 5px 8px;border-radius:999px;background:#FFF6DA;border:2px solid var(--gold);font-size:20px;font-weight:900;color:#8A5A00;flex:none}
+.tkc .tkic{width:36px;height:24px}
+.tkc.bump{animation:tkbump .5s cubic-bezier(.3,1.8,.5,1)}
+@keyframes tkbump{30%{transform:scale(1.28)}100%{transform:none}}
+.tkplus{position:absolute;right:4px;top:-8px;font-size:19px;font-weight:900;color:#B7790A;animation:tkplus .9s ease-out forwards;pointer-events:none}
+@keyframes tkplus{0%{opacity:0;transform:translateY(6px)}20%{opacity:1}100%{opacity:0;transform:translateY(-28px)}}
+.tkfly{position:fixed;left:0;top:0;z-index:150;pointer-events:none;will-change:transform}
+.tkfly svg{width:50px;height:33px;display:block;filter:drop-shadow(0 3px 2px rgba(0,0,0,.25))}
+.timeup{position:fixed;left:50%;top:16px;transform:translateX(-50%);z-index:140;display:flex;align-items:center;gap:14px;background:#fff;border:3px solid var(--red);border-radius:999px;padding:8px 28px 8px 10px;font-size:24px;font-weight:900;color:var(--red);box-shadow:0 6px 0 rgba(0,0,0,.08);transition:opacity .5s;white-space:nowrap}
+.timeup svg{width:46px;height:46px}
+.timeup.out{opacity:0}
+.unlock{display:flex;align-items:center;gap:16px;margin:18px auto 0;max-width:580px;text-align:left;background:#FFF6DA;border:3px solid var(--gold);border-radius:18px;padding:14px 22px;font-size:18px;line-height:1.6;animation:zpop .6s cubic-bezier(.3,1.6,.5,1) both .8s}
+.unlock .inf{font-size:56px;color:#B7790A}
+.unlock b{font-size:22px}
+
 .home{display:grid;gap:20px;grid-template-columns:1.2fr 1fr;align-items:start}
 .cover{grid-column:1/-1;display:flex;align-items:center;gap:22px;background:var(--cover);color:#fff;border-radius:22px;padding:22px 28px;position:relative;overflow:hidden}
 .cover .label{background:#fff;color:var(--ink);border-radius:10px;padding:10px 22px;font-size:30px;font-weight:900;letter-spacing:.05em}
@@ -220,7 +268,16 @@ button:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--sky);outli
 .yomi-chips .chip{position:relative}
 .yomi-chips .chip.heard{border-color:var(--cover);background:#E3F1E8}
 .yomi-chips .chip.heard::after{content:'';position:absolute;top:-8px;right:-8px;width:20px;height:20px;border-radius:50%;background:var(--cover) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E") center/14px no-repeat}
-.yomi-chips:not(:has(.heard)) .chip{animation:chipcall 1.6s ease-in-out infinite}
+.yomi-chips.call .chip:not(.heard),.words.call .word:not(.heard){animation:chipcall 1.6s ease-in-out infinite}
+.word{position:relative}
+.word.heard{border-color:var(--cover);background:#E3F1E8}
+.word.heard::after{content:'';position:absolute;top:-8px;right:-8px;width:20px;height:20px;border-radius:50%;background:var(--cover) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E") center/14px no-repeat}
+.masu.trace.call{animation:masucall 1.6s ease-in-out infinite}
+@keyframes masucall{50%{box-shadow:0 0 0 6px rgba(61,127,201,.3)}}
+.sec-title.tmsg.ok{color:var(--cover)}.sec-title.tmsg.ng{color:var(--red)}
+.tmsg{font-weight:800;line-height:1.4}
+.tmsg.ok{color:var(--cover)}.tmsg.ng{color:var(--red)}.tmsg.wait{color:var(--ink2)}
+#tfmsg{display:block;margin:8px 0 0;font-size:18px}
 @keyframes chipcall{50%{border-color:var(--sky)}}
 .need{font-size:16px;font-weight:700;color:var(--red)}
 .words{display:flex;flex-wrap:wrap;gap:12px}
@@ -2659,13 +2716,18 @@ function planToday(){
   S.plan={date:td,level:T(),newK:order.slice(0,n),newB};save();
   return S.plan;
 }
-function buildSession(){
+function buildSession(sl=slotNow()){
   const plan=planToday(),td=today();const B=budget();
-  const pending=plan.newK.filter(k=>{const ks=S.kanji[k]||{};return !ks.intro||ks.intro===td&&!ks.introDone});
+  let pending=plan.newK.filter(k=>{const ks=S.kanji[k]||{};return !ks.intro||ks.intro===td&&!ks.introDone});
   const doneToday=new Set((S.days[td]&&S.days[td].rated)||[]);
   let {rev,fresh}=dueLists();
   rev=rev.filter(id=>!doneToday.has(id));fresh=fresh.filter(id=>!doneToday.has(id));
-  const newB=plan.newB.filter(id=>!doneToday.has(id)&&!(S.items[id]&&S.items[id].reps>0));
+  let newB=plan.newB.filter(id=>!doneToday.has(id)&&!(S.items[id]&&S.items[id].reps>0));
+  // 新しい漢字・新しい問題は、午前と午後で半分ずつ（午前にやらなかった分は午後に出る）
+  if(sl==='am'){
+    const nk=plan.newK.length-pending.length;pending=pending.slice(0,Math.max(0,Math.ceil(plan.newK.length/2)-nk));
+    const nb=plan.newB.length-newB.length;newB=newB.slice(0,Math.max(0,Math.ceil(plan.newB.length/2)-nb));
+  }
   const room=Math.max(6,B-pending.length*3-newB.length);
   rev=rev.slice(0,room);
   fresh=fresh.slice(0,Math.min(FRESH_PER_DAY,Math.max(0,room-rev.length)));
@@ -2677,10 +2739,13 @@ function buildSession(){
       .sort((a,b)=>retr(S.items[a],at)-retr(S.items[b],at)).slice(0,room-rev.length-fresh.length);
   }
   const singles=rev.concat(fresh,extra,newB).map(id=>makeCard(id)).filter(Boolean);
-  const blocks=pending.map(k=>[{type:'intro',k},makeCard(`${k}:y`,0),makeCard(`${k}:w`,0)]);
+  const blocks=pending.map(k=>[{type:'intro',k,blk:k},Object.assign(makeCard(`${k}:y`,0),{blk:k}),Object.assign(makeCard(`${k}:w`,0),{blk:k})]);
   const q=[];let bi=0;
   for(let i=0;i<singles.length;i++){q.push(singles[i]);if((i+1)%4===0&&bi<blocks.length)q.push(...blocks[bi++]);}
   while(bi<blocks.length)q.push(...blocks[bi++]);
+  // 練習時間いっぱいまで、おさらいで うめる
+  const n=q.filter(c=>c.type!=='intro').length;
+  if(n<B)q.push(...fillCards(B-n,new Set(q.map(c=>c.id).filter(Boolean)),sl));
   return q;
 }
 function makeCard(id,variant){
@@ -2707,11 +2772,15 @@ function rate(id,g){
     ks.answers++;if(g==='again')ks.misses++;
     if(ks.misses>=3)ks.weak=true;
     const st=stage(k);
-    for(const s of [3,4,5])if(st>=s&&!ks.starAt[s]){ks.starAt[s]=now.toISOString();Zoo.earn({3:5,4:10,5:20}[s],0)}
+    for(const s of [3,4,5])if(st>=s&&!ks.starAt[s]){ks.starAt[s]=now.toISOString();earnT({3:5,4:10,5:20}[s],0)}
     if(ks.weak&&st>=3&&!ks.revived){ks.revived=true;ks.revivedNew=true}
   }
-  const td=today();const day=S.days[td]||(S.days[td]={n:0,rated:[],done:false});
-  day.n++;if(!day.rated.includes(id)){day.rated.push(id);Zoo.earn(1,1)}
+  const day=dayRec();day.n++;
+  const first=!day.rated.includes(id);if(first)day.rated.push(id);
+  // チケット：午前・午後それぞれで 1問1枚（同じ時間帯に2回目は0枚）。むげんモードは 1日に1回まで
+  const ss=SESSION;
+  if(ss&&ss.mode==='study'&&ss.slot){const r=slotRec(ss.slot);r.ids=r.ids||[];if(!r.ids.includes(id)){r.ids.push(id);r.n=(r.n||0)+1;earnT(1,1)}}
+  else if(first)earnT(1,1);
   save();
 }
 
@@ -2813,12 +2882,12 @@ class Pad{
     this._ro=new ResizeObserver(()=>this.resize());this._ro.observe(canvas);
   }
   resize(){const r=this.c.getBoundingClientRect();const d=window.devicePixelRatio||1;this.c.width=Math.max(1,r.width*d);this.c.height=Math.max(1,r.height*d);this.draw()}
-  draw(ctx=this.x,W=this.c.width,H=this.c.height,hi=null){
+  draw(ctx=this.x,W=this.c.width,H=this.c.height,hi=this.hi){
     ctx.clearRect(0,0,W,H);ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=H*0.04;
     for(const[si,s]of this.strokes.entries()){ctx.strokeStyle=hi&&hi.includes(si)?'#E0412E':'#27313A';ctx.beginPath();s.forEach(([x,y],i)=>i?ctx.lineTo(x*W,y*H):ctx.moveTo(x*W,y*H));if(s.length===1)ctx.lineTo(s[0][0]*W+0.1,s[0][1]*H);ctx.stroke()}
   }
-  undo(){this.strokes.pop();this.draw();this.onchange&&this.onchange()}
-  clear(){this.strokes=[];this.draw();this.onchange&&this.onchange()}
+  undo(){this.strokes.pop();this.hi=null;this.draw();this.onchange&&this.onchange()}
+  clear(){this.strokes=[];this.hi=null;this.draw();this.onchange&&this.onchange()}
   get empty(){return this.strokes.length===0}
   image(size=180,hi=null){const c=document.createElement('canvas');c.width=size*this.cells;c.height=size;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,size);this.draw(x,c.width,size,hi);return c.toDataURL('image/png')}
   destroy(){this._ro&&this._ro.disconnect()}
@@ -2872,22 +2941,204 @@ fixTree(document.body);
 /* ---------- 画面遷移 ---------- */
 const app=$('#app');let pads=[];
 function mount(html){animToken++;pads.forEach(p=>p.destroy());pads=[];app.innerHTML=`<div class="screen">${html}</div>`;app.scrollTop=0;window.scrollTo(0,0)}
-function go(name,arg){({home:Home,study:Study,zukan:Zukan,mock:Mock,parent:Parent,zoo:()=>Zoo.open()})[name](arg)}
+function go(name,arg){({home:Home,study:Study,endless:Endless,zukan:Zukan,mock:Mock,parent:Parent,zoo:()=>Zoo.open()})[name](arg)}
 const kyuLabel=L=>`${L}{級|きゅう}`;
+
+/* =================== 午前・午後の練習／タイマー／むげんモード／チケットの演出 =================== */
+// 0〜12時が午前、12時からが午後。それぞれ1回ずつ練習できる
+const slotNow=()=>new Date().getHours()<12?'am':'pm';
+const SLOT_JA={am:'{午前|ごぜん}',pm:'{午後|ごご}'};
+function dayRec(td=today()){return S.days[td]||(S.days[td]={n:0,rated:[],done:false})}
+const EMPTY_SLOT=Object.freeze({used:0,done:false,n:0,ids:[]});
+function slotGet(sl=slotNow(),td=today()){const d=S.days[td];return(d&&d.slots&&d.slots[sl])||EMPTY_SLOT}
+function slotRec(sl=slotNow(),td=today()){const d=dayRec(td);d.slots=d.slots||{};return d.slots[sl]||(d.slots[sl]={used:0,done:false,n:0,ids:[]})}
+/* 練習した級（むげんモードの連続日数に使う）。これまでの記録は、いまの級で練習したものとみなす */
+if(!S.mig2){for(const d in S.days){const v=S.days[d];if(v&&v.done&&!v.lv)v.lv=[S.settings.level||10]}S.mig2=1}
+S.endless=S.endless||{};
+
+/* ---------- タイマー（Time Timer のように、赤い部分が のこり時間） ----------
+   練習の画面にいる間だけ進む。ホームなどに もどると止まり、「つづける」で のこりから。 */
+const TIMER={on:false,t0:0,sl:null,td:null,saved:0,paused:false};
+const timerDur=()=>Math.max(1,+S.settings.minutes||15)*60000;
+function timerUsed(sl=slotNow(),td=today()){const r=slotGet(sl,td);return r.used+(TIMER.on&&TIMER.sl===sl&&TIMER.td===td?Date.now()-TIMER.t0:0)}
+const timerLeft=(sl,td)=>Math.max(0,timerDur()-timerUsed(sl,td));
+function timerCommit(){if(!TIMER.on)return;const now=Date.now();const r=slotRec(TIMER.sl,TIMER.td);r.used=Math.min(timerDur(),r.used+(now-TIMER.t0));TIMER.t0=now}
+function timerStart(sl){TIMER.on=true;TIMER.t0=Date.now();TIMER.sl=sl;TIMER.td=today();TIMER.saved=Date.now()}
+function timerStop(){if(!TIMER.on)return;timerCommit();TIMER.on=false;save()}
+function ttSector(min,r){
+  if(min<=0.01)return'';
+  if(min>=59.99)return`M50 ${50-r}A${r} ${r} 0 1 0 50 ${50+r}A${r} ${r} 0 1 0 50 ${50-r}Z`;
+  const a=min*6*Math.PI/180,x=50-r*Math.sin(a),y=50-r*Math.cos(a);
+  return`M50 50L50 ${50-r}A${r} ${r} 0 ${min>30?1:0} 0 ${x.toFixed(2)} ${y.toFixed(2)}Z`;
+}
+function ttSvg(big){
+  const R=big?33:40;let s=`<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="49.5" fill="#3C4650"/><circle cx="50" cy="50" r="46.5" fill="#fff"/><path class="ttred" fill="#E0412E" d="" data-r="${R}"/>`;
+  for(let m=0;m<60;m++){const a=-m*6*Math.PI/180,r1=45,r2=m%5?(big?42.5:42):(big?39.5:38.5);
+    s+=`<line x1="${(50+r1*Math.sin(a)).toFixed(2)}" y1="${(50-r1*Math.cos(a)).toFixed(2)}" x2="${(50+r2*Math.sin(a)).toFixed(2)}" y2="${(50-r2*Math.cos(a)).toFixed(2)}" stroke="#3C4650" stroke-width="${m%5?.7:1.5}"/>`}
+  if(big)for(let m=0;m<60;m+=5){const a=-m*6*Math.PI/180;s+=`<text x="${(50+36*Math.sin(a)).toFixed(2)}" y="${(50-36*Math.cos(a)+2.6).toFixed(2)}" text-anchor="middle" font-size="7.4" font-weight="700" fill="#3C4650" style="font-family:var(--ui)">${m}</text>`}
+  // 数字は赤い円盤の上に重なるので、赤い円盤を数字の内側にする
+  return s+`<circle cx="50" cy="50" r="${big?6:7}" fill="#EEF1F3" stroke="#AEB8BF" stroke-width="1.2"/></svg>`;
+}
+const ttHtml=(kind,sl=slotNow())=>`<span class="tt ${kind}" data-tt="${sl}">${ttSvg(kind==='big')}</span>`;
+function drawTT(){
+  $$('[data-tt]').forEach(el=>{const left=timerLeft(el.dataset.tt);const p=el.querySelector('.ttred');p&&p.setAttribute('d',ttSector(left/60000,+p.dataset.r));el.classList.toggle('up',left<=0)});
+  $$('[data-ttl]').forEach(el=>{const left=timerLeft(el.dataset.ttl);el.innerHTML=left<=0?'じかん！':left<60000?'あと すこし':`あと <b>${Math.ceil(left/60000)}</b>ふん`});
+}
+setInterval(()=>{
+  if(document.hidden)return;
+  drawTT();
+  if(!TIMER.on)return;
+  if(Date.now()-TIMER.saved>5000){timerCommit();save();TIMER.saved=Date.now()}
+  if(timerLeft(TIMER.sl,TIMER.td)<=0&&SESSION&&SESSION.mode==='study'&&!SESSION.timeUp){SESSION.timeUp=true;timerStop();timeUpFx()}
+},500);
+// iPad を閉じたり 別のアプリに切りかえたりしている間は止める
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){if(TIMER.on){timerStop();TIMER.paused=true}}
+  else if(TIMER.paused){TIMER.paused=false;if(SESSION&&SESSION.mode==='study'&&!SESSION.timeUp&&$('.topbar [data-tt]'))timerStart(SESSION.slot)}
+});
+let AC=null;
+document.addEventListener('pointerdown',()=>{try{if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){}},{capture:true});
+function chime(){try{if(!AC)return;const t=AC.currentTime;[[784,0],[988,.2],[1319,.4]].forEach(([f,d])=>{const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,t+d);g.gain.linearRampToValueAtTime(.16,t+d+.02);g.gain.exponentialRampToValueAtTime(.001,t+d+1);o.connect(g);g.connect(AC.destination);o.start(t+d);o.stop(t+d+1.05)})}catch(e){}}
+function timeUpFx(){
+  chime();drawTT();
+  const b=document.createElement('div');b.className='timeup';
+  b.innerHTML=`${ttSvg(false)}<span>じかんだよ！ この {問題|もんだい}で おしまい</span>`;
+  document.body.appendChild(b);setTimeout(()=>b.classList.add('out'),4200);setTimeout(()=>b.remove(),4800);
+}
+
+/* ---------- むげんモード：級ごとに、練習を5日つづけると ひらく ---------- */
+const ENDLESS_DAYS=5;
+const dayLv=td=>(S.days[td]&&S.days[td].lv)||[];
+function levelStreak(L=T()){let n=0;const d=new Date();if(!dayLv(ymd(d)).includes(L))d.setDate(d.getDate()-1);while(dayLv(ymd(d)).includes(L)){n++;d.setDate(d.getDate()-1)}return n}
+const endlessOpen=(L=T())=>!!S.endless[L];
+function checkEndless(){const L=T();if(!endlessOpen(L)&&levelStreak(L)>=ENDLESS_DAYS){S.endless[L]=today();S.endlessNew=L;save();return true}return false}
+/* 練習できる問題：出会った漢字で一度は答えた問題と、答えたことのある問題バンク */
+function practiceIds(){
+  const L=T(),ids=[];
+  for(const k in S.kanji){const ks=S.kanji[k];if(!ks.intro||!KD[k]||!(LEVEL_OF[k]>=L))continue;
+    for(const t of activeKinds(k)){const id=`${k}:${t}`;const it=S.items[id];if(it&&it.reps>0)ids.push(id)}}
+  for(const id in S.items){if(id[0]==='B'&&S.items[id].reps>0&&bankById(id))ids.push(id)}
+  return ids;
+}
+/* むげんモードの問題：期日の来たものを多めに、あとは あやしいものほど よく出る */
+function endlessCards(n,avoid){
+  const eod=endOfDay(new Date());const all=practiceIds();
+  let ids=all.filter(id=>!avoid.has(id));if(!ids.length)ids=all;
+  const pool=ids.map(id=>{const it=S.items[id];return[id,new Date(it.card.due)<=eod?3:(1-retr(it))+.25]});
+  const out=[];
+  while(out.length<n&&pool.length){let r=Math.random()*pool.reduce((a,p)=>a+p[1],0),j=0;for(;j<pool.length-1;j++){r-=pool[j][1];if(r<=0)break}out.push(pool[j][0]);pool.splice(j,1)}
+  return out.map(id=>makeCard(id)).filter(Boolean);
+}
+/* 時間いっぱいまで練習できるように、おさらいで うめる（今日まだ答えていない問題 → ほかの時間帯に答えた問題） */
+function fillCards(n,exclude,sl){
+  if(n<=0)return[];
+  const rated=new Set((S.days[today()]||{}).rated||[]),mine=new Set(slotGet(sl).ids||[]);
+  const ids=practiceIds().filter(id=>!exclude.has(id));
+  const byR=a=>a.sort((x,y)=>retr(S.items[x])-retr(S.items[y]));
+  return byR(ids.filter(id=>!rated.has(id))).concat(byR(ids.filter(id=>rated.has(id)&&!mine.has(id))))
+    .slice(0,n).map(id=>makeCard(id)).filter(Boolean);
+}
+function Endless(){
+  const L=T();if(!endlessOpen(L)){Home();return}
+  const q=endlessCards(10,new Set());
+  if(!q.length){toast('まだ れんしゅうした かんじが ないよ');return}
+  if(S.endlessNew===L){delete S.endlessNew;save()}
+  SESSION={q,i:0,total:0,before:{},touched:new Set(),rated:new Set(),count:0,mode:'endless',zs:Zoo.snap()};
+  nextCard();
+}
+/* 練習の時間帯を おわりにする（おわりのチケット・練習した級の記録）。むげんモードが ひらいたら true */
+function completeSlot(sl){
+  const td=today(),day=dayRec(td),r=slotRec(sl,td);if(r.done)return false;
+  r.done=true;day.done=true;day.lv=[...new Set([...(day.lv||[]),T()])];
+  Zoo.onFinish(calcStreak(),sl);const opened=checkEndless();save();return opened;
+}
+
+/* ---------- チケットが ふえる演出 ---------- */
+let PT={x:innerWidth/2,y:innerHeight/2};
+document.addEventListener('pointerdown',e=>{PT={x:e.clientX,y:e.clientY}},{capture:true});
+const TK={fly:0};
+const TICKET='<svg viewBox="0 0 40 26" class="tkic" aria-hidden="true"><path d="M3 2H37a2 2 0 0 1 2 2V9a4 4 0 0 0 0 8V22a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V17a4 4 0 0 0 0-8V4a2 2 0 0 1 2-2Z" fill="#F6B73C" stroke="#A86B05" stroke-width="2"/><path d="M28 4.5V21.5" stroke="#A86B05" stroke-width="1.6" stroke-dasharray="2.4 2.2"/><path d="M14.5 6.8l1.9 3.9 4.3.6-3.1 3 .7 4.3-3.8-2-3.8 2 .7-4.3-3.1-3 4.3-.6z" fill="#fff"/></svg>';
+const tkShown=()=>Zoo.state().tickets-TK.fly;
+const tkHud=()=>S.settings.zooHidden?'':`<span class="tkc" id="tkc" aria-label="チケット">${TICKET}<b>${tkShown()}</b></span>`;
+function earnT(t,f=0){Zoo.earn(t,f);ticketFx(t)}
+function ticketFx(t){
+  if(!t||S.settings.zooHidden)return;
+  const from={x:PT.x,y:PT.y},n=Math.min(t,5),each=[];for(let i=0;i<n;i++)each.push(i<n-1?Math.floor(t/n):t-Math.floor(t/n)*(n-1));
+  TK.fly+=t;
+  const land=v=>{TK.fly=Math.max(0,TK.fly-v);const c=$('#tkc');if(!c)return;c.querySelector('b').textContent=tkShown();
+    c.classList.remove('bump');void c.offsetWidth;c.classList.add('bump');
+    const p=document.createElement('span');p.className='tkplus';p.textContent=`+${v}`;c.appendChild(p);setTimeout(()=>p.remove(),900)};
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const tg=$('#tkc');
+    if(!tg||reduce){each.forEach(land);return}
+    const r=tg.getBoundingClientRect(),tx=r.left+22,ty=r.top+r.height/2;
+    each.forEach((v,i)=>setTimeout(()=>{
+      const el=document.createElement('div');el.className='tkfly';el.innerHTML=TICKET;document.body.appendChild(el);
+      const sx=from.x+(i-(n-1)/2)*26,sy=from.y,mx=(sx+tx)/2+(sx<tx?-60:60),my=Math.min(sy,ty)-90-i*8;
+      const k=(x,y,s,o,rot=0)=>({transform:`translate(${x}px,${y}px) translate(-50%,-50%) scale(${s}) rotate(${rot}deg)`,opacity:o});
+      let landed=false;const fin=()=>{if(landed)return;landed=true;el.remove();land(v)};
+      try{const a=el.animate([k(sx,sy,.5,0),Object.assign(k(sx,sy-36,1.35,1,-8),{offset:.2}),Object.assign(k(mx,my,1.15,1,10),{offset:.55}),k(tx,ty,.75,1)],{duration:850,easing:'ease-in-out',fill:'forwards'});a.onfinish=fin}catch(e){}
+      setTimeout(fin,1300);  // アニメーションが動かないときも、数は かならず ふやす
+    },i*110));
+  }));
+}
+function countUp(root=document){
+  $$('.zgain b',root).forEach(b=>{const m=b.textContent.match(/\d+/);if(!m)return;const to=+m[0];const t0=performance.now(),dur=Math.min(1400,400+to*40);
+    const step=now=>{const p=Math.min(1,(now-t0)/dur);b.textContent=`+${Math.round(to*(1-Math.pow(1-p,3)))}`;if(p<1)requestAnimationFrame(step)};
+    b.textContent='+0';setTimeout(()=>requestAnimationFrame(step),500)});
+}
+
+/* ---------- なぞり書きの判定（お手本を見ながら書くとき） ---------- */
+function orderText(r){
+  const m=[];
+  if(r.orderWrong.length)m.push(r.orderWrong.length>6?'{書き順|かきじゅん}が ちがう ところが たくさん あるよ':`${numList(r.orderWrong)}{画目|かくめ}の {書き順|かきじゅん}が ちがうよ`);
+  if(r.dirWrong.length)m.push(`${numList(r.dirWrong)}{画目|かくめ}は {書|か}く {向|む}きが {反対|はんたい}だよ`);
+  return m.join('<br>');
+}
+function traceCheck(k,pad){
+  pad.hi=null;
+  if(S.settings.autoJudge===false)return{ok:true,msg:''};
+  const n=pad.strokes.length,m=(STROKES[k]||[]).length;
+  if(!n)return{ok:false,msg:''};
+  if(n<m){pad.draw();return{ok:false,msg:`あと ${m-n}{画|かく}`,cls:'wait'}}
+  const r=judgeWriting(k,pad.strokes);
+  if(!r||r.verdict==='ok'){pad.draw();return{ok:true,msg:'じょうず！',cls:'ok'}}
+  if(r.reason==='order')pad.hi=r.wrongUser;
+  pad.draw();
+  let why;
+  if(r.reason==='count')why=`${m}{画|かく}で なぞろう（いまは ${n}{画|かく}）`;
+  else if(r.reason==='shape')why='お{手本|てほん}の {上|うえ}を ていねいに なぞろう';
+  else if(r.orderWrong.length>6)why='{書き順|かきじゅん}が ちがう ところが たくさん あるよ';
+  else why=[r.orderWrong.length?`${numList(r.orderWrong)}{画目|かくめ}の {書き順|かきじゅん}`:'',r.dirWrong.length?`${numList(r.dirWrong)}{画目|かくめ}の {向|む}き`:''].filter(Boolean).join('・')+'が ちがうよ';
+  return{ok:false,msg:why,cls:'ng'};
+}
 
 /* =================== ホーム =================== */
 function Home(){
+  timerStop();
   const L=T();
   if(!READY[L]){Parent(true);return}
   const ei=examInfo();const plan=planToday();
-  const q=buildSession();
-  const doneToday=q.length===0;
+  const sl=slotNow();
+  // 時間切れのまま アプリを とじていた時間帯は、ここで おわりにする
+  if(!slotGet(sl).done&&slotGet(sl).used>0&&timerLeft(sl)<=0)completeSlot(sl);
+  const rec=slotGet(sl),slotDone=rec.done;
+  const q=slotDone?[]:buildSession(sl);
+  const doneToday=slotDone||q.length===0;
+  const opened=endlessOpen(L)||checkEndless(),ls=levelStreak(L);
   const ks=LEVELS[L];const st=ks.map(stage);const learned=st.filter(s=>s>=3).length;
   const c=[0,0,0];st.forEach(s=>{if(s>=3)c[s-3]++});
   const streak=calcStreak();const mine=S.mocks.filter(m=>(m.level||10)===L);const best=mine.length?Math.max(...mine.map(m=>m.score)):null;
   const mins=Math.max(1,Math.round(q.length*PER_CARD_SEC/60));
   const cols=ks.length<=80?10:ks.length<=200?16:20;
-  const newCount=plan.newK.filter(k=>!(S.kanji[k]&&S.kanji[k].introDone)).length;
+  const newCount=q.filter(c=>c.type==='intro').length;
+  const pill=x=>{const r=slotGet(x);const st=r.done?'fin':x===sl?'now':x==='am'?'past':'later';
+    return`<span class="slot ${st}">${st==='fin'?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>':''}${SLOT_JA[x]}${st==='later'?'<small>12じから</small>':''}</span>`};
+  const doneMsg=slotDone?(sl==='am'?`{午前|ごぜん}の {練習|れんしゅう}は おしまい！<br>{午後|ごご}（12じ）から また できるよ`:'{今日|きょう}は {全部|ぜんぶ} {終|お}わったよ。また {明日|あした}！'):'いまは {練習|れんしゅう}する {問題|もんだい}が ないよ';
+  const lockSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>';
+  const endlessCard=opened?`<div class="sheet endless-card open"><div><h3><span class="inf">∞</span>むげんモード${S.endlessNew===L?'<span class="new">NEW</span>':''}</h3><p>{覚|おぼ}えた {漢字|かんじ}を ずっと {練習|れんしゅう}できるよ</p></div><button class="btn small" id="endless">やる</button></div>`:
+    `<div class="sheet endless-card">${lockSvg}<div><h3>むげんモード</h3><p>${kyuLabel(L)}で 5{日|か} つづけて {練習|れんしゅう}すると ひらくよ</p></div><span class="dots">${[...Array(ENDLESS_DAYS)].map((_,i)=>`<i class="${i<ls?'on':''}"></i>`).join('')}</span></div>`;
   mount(`
   <div class="home">
     <div class="cover">
@@ -2896,11 +3147,12 @@ function Home(){
     </div>
     <div class="side left">
       <div class="sheet today">
-        <h3>{今日|きょう}の {練習|れんしゅう}</h3>
-        ${doneToday?`<div class="meta">{今日|きょう}は {全部|ぜんぶ} {終|お}わったよ。また {明日|あした}！</div>
-          <button class="btn ghost" id="again">{図鑑|ずかん}を {見|み}る</button>`:
-          `<div class="meta">${q.length}{問|もん}・{約|やく} ${mins}{分|ぷん}${newCount?`<br>{新|あたら}しい {漢字|かんじ} ${newCount}{個|こ}`:''}</div>
-          <button class="btn" id="start">${IC.play.replace('<svg','<svg width="28" height="28"')} {始|はじ}める</button>`}
+        <div class="todayhead"><h3>{今日|きょう}の {練習|れんしゅう}</h3><div class="slots">${pill('am')}${pill('pm')}</div></div>
+        ${doneToday?`<div class="meta">${doneMsg}</div>`:
+          `<div class="trow">${ttHtml('big',sl)}<div class="tinfo">
+            <div class="tleft" data-ttl="${sl}"></div>
+            ${newCount?`<div class="meta">{新|あたら}しい {漢字|かんじ} ${newCount}{個|こ}</div>`:''}
+            <button class="btn" id="start">${IC.play.replace('<svg','<svg width="28" height="28"')} ${rec.used>0?'{続|つづ}ける':'{始|はじ}める'}</button></div></div>`}
         <div class="streak">${streak>0?`{連続|れんぞく} ${streak}{日|にち} {続|つづ}いてるよ`:'{今日|きょう}から {始|はじ}めよう'}</div>
       </div>
       <div class="sheet mock-peek">
@@ -2915,11 +3167,13 @@ function Home(){
         <div class="minigrid" style="grid-template-columns:repeat(${cols},1fr)">${st.map(s=>`<i class="s${s}"></i>`).join('')}</div>
         <div class="stars"><span style="color:var(--gold)">★ ${c[0]}</span><span>★★ ${c[1]}</span><span>★★★ ${c[2]}</span></div>
       </div>
+      ${endlessCard}
       <button class="parent-link" id="parent"><span class="fill"></span>おうちの {方|かた}へ（{長押|ながお}し）</button>
     </div>
   </div>`);
   $('#start')&&($('#start').onclick=()=>go('study'));
-  $('#again')&&($('#again').onclick=()=>go('zukan'));
+  $('#endless')&&($('#endless').onclick=()=>go('endless'));
+  drawTT();
   $('#zk').onclick=()=>go('zukan');$('#zk').onkeydown=e=>{if(e.key==='Enter')go('zukan')};
   $('#mock').onclick=()=>go('mock');
   longPress($('#parent'),()=>go('parent'));
@@ -2942,30 +3196,42 @@ function longPress(el,fn){
 /* =================== 学習 =================== */
 let SESSION=null;
 function Study(){
-  const q=buildSession();
+  const sl=slotNow();
+  if(slotGet(sl).done||timerLeft(sl)<=0){Home();return}
+  const q=buildSession(sl);
   if(!q.length){Home();return}
   const touched=new Set(q.map(c=>c.k).filter(Boolean));
   const before=Object.fromEntries([...touched].map(k=>[k,stage(k)]));
-  SESSION={q,i:0,total:q.length,before,touched,rated:new Set(),mode:'study',zs:Zoo.snap()};
+  SESSION={q,i:0,total:q.length,before,touched,rated:new Set(),count:0,mode:'study',slot:sl,zs:Zoo.snap()};
+  timerStart(sl);
   nextCard();
 }
 function header(){
-  const s=SESSION;const pct=Math.round(s.i/Math.max(1,s.q.length)*100);
-  return`<div class="topbar"><button class="iconbtn" id="quit" aria-label="ホームへ">${IC.home}</button><div class="progress"><i style="width:${pct}%"></i></div><span class="muted" style="font-weight:700;font-size:18px">${Math.max(0,s.q.length-s.i)}</span></div>`;
+  const s=SESSION;
+  if(s.mode==='endless')return`<div class="topbar"><button class="iconbtn" id="quit" aria-label="おわる">${IC.home}</button><div class="endless-tag"><span class="inf">∞</span>むげんモード<span class="muted"><b>${s.count}</b>{問|もん}</span></div>${tkHud()}</div>`;
+  const pct=Math.round(s.i/Math.max(1,s.q.length)*100);
+  return`<div class="topbar"><button class="iconbtn" id="quit" aria-label="ホームへ">${IC.home}</button><div class="progress"><i style="width:${pct}%"></i></div><span class="muted" style="font-weight:700;font-size:18px">${Math.max(0,s.q.length-s.i)}</span>${s.mode==='study'?ttHtml('mini',s.slot)+tkHud():''}</div>`;
 }
 const RENDER={intro:showIntro,yomi:showYomi,doji:showDoji,kaki:showKaki,okuri:showOkuri,hitsu:showHitsu,kakusu:showKakusu,bushu:showBushu,
   taigi:showFill,sanji:showFill,yoji:showFill,doon:showDoon,kousei:showKousei,goji:showGoji};
 function nextCard(){
   const s=SESSION;
+  if(s.mode==='endless'&&s.i>=s.q.length-2)s.q.push(...endlessCards(10,new Set(s.q.slice(-8).map(c=>c.id))));
   if(s.i>=s.q.length){s.mode==='mock'?mockResult():finishStudy();return}
   const c=s.q[s.i];
+  // 時間になったら、いまの問題（新しい漢字は 読み・書きまで）で おしまい
+  if(s.timeUp&&!(c.blk&&c.blk===s.blk)){finishStudy('time');return}
+  if(c.type==='intro')s.blk=c.k;
+  if(c.k&&s.touched&&!s.touched.has(c.k)){s.touched.add(c.k);s.before[c.k]=stage(c.k)}
   RENDER[c.type](c);
-  $('#quit').onclick=async()=>{if(s.mode==='mock'&&!(await ask('もぎテストを やめる？','やめる',false,'{続|つづ}ける')))return;Home()};
+  if(s.mode==='study')drawTT();
+  $('#quit').onclick=async()=>{if(s.mode==='mock'&&!(await ask('もぎテストを やめる？','やめる',false,'{続|つづ}ける')))return;if(s.mode==='endless'){finishStudy('endless');return}Home()};
 }
 function advance(c,g){
   const s=SESSION;
   if(s.mode==='mock'){s.answers.push({c,g});s.i++;nextCard();return}
-  if(c.type!=='intro'&&!s.rated.has(c.id)){rate(c.id,g);s.rated.add(c.id)}
+  if(c.type!=='intro')s.count=(s.count||0)+1;
+  if(c.type!=='intro'&&(!s.rated.has(c.id)||s.mode==='endless')){rate(c.id,g);s.rated.add(c.id)}
   if(g==='again'){
     const again=Object.assign({},c,{retry:true});
     if((again.type==='yomi'||again.type==='kaki')&&KD[c.k]){const n=KD[c.k][again.type].length;again.v=(again.v+1)%n}
@@ -3006,21 +3272,30 @@ function showIntro(c){
     <div class="sheet card">
       <div class="sec-title">{言葉|ことば}</div>
       <div class="words">${wordsHtml(d)}</div>
-      <div class="sec-title">なぞって みよう</div>
+      <div class="sec-title" id="tmsg">なぞって みよう</div>
       <div class="masu trace">${guideSvg(c.k,'#D5DDE2')}<canvas></canvas></div>
       <div class="introbar"><button class="iconbtn" id="undo" aria-label="1{画|かく} もどす">${IC.undo}</button><button class="btn ghost small" id="clear">{全部|ぜんぶ} {消|け}す</button><span style="flex:1"></span><span class="need" id="need"></span><button class="btn" id="next" disabled>{次|つぎ}へ</button></div>
     </div>
   </div>`);
   const svg=$('#anim svg');animate(svg,300);
   $('#replay').onclick=()=>animate(svg);
-  bindSay();bindPad($('.masu canvas'));
-  // 読み方を ぜんぶ タッチして 聞いたら、次へ 進める
-  const ys=$$('.yomi-chips .chip'),heard=new Set();
-  const upd=()=>{const n=heard.size,all=ys.length;$('#next').disabled=n<all;
-    $('#need').innerHTML=n<all?`{読み方|よみかた}を ぜんぶ タッチしてね（${n}/${all}）`:'';$('#need').hidden=n>=all};
-  ys.forEach((b,i)=>b.addEventListener('click',()=>{heard.add(i);b.classList.add('heard');upd()}));
+  bindSay();const pad=bindPad($('.masu canvas'));
+  // 読み方と 言葉を ぜんぶ タッチして 聞き、お手本を 正しい書き順で なぞれたら、次へ 進める
+  const ys=$$('.yomi-chips .chip'),ws=$$('.words .word'),hy=new Set(),hw=new Set();let tr={ok:S.settings.autoJudge===false,msg:''};
+  const upd=()=>{
+    const yDone=hy.size>=ys.length,wDone=hw.size>=ws.length;
+    $('.yomi-chips').classList.toggle('call',!yDone);$('.words').classList.toggle('call',yDone&&!wDone);
+    $('.masu.trace').classList.toggle('call',yDone&&wDone&&!tr.ok&&!pad.strokes.length);
+    const need=!yDone?`{読み方|よみかた}を ぜんぶ タッチしてね（${hy.size}/${ys.length}）`:!wDone?`{言葉|ことば}も ぜんぶ タッチしてね（${hw.size}/${ws.length}）`:
+      tr.ok?'':!pad.strokes.length?'お{手本|てほん}を なぞってね':tr.cls==='wait'?'さいごまで なぞってね':'{全部|ぜんぶ} {消|け}して もう いちど';
+    $('#need').innerHTML=need;$('#need').hidden=!need;$('#next').disabled=!!need;
+    const tm=$('#tmsg');tm.innerHTML=tr.msg||'なぞって みよう';tm.className='sec-title tmsg '+(tr.cls||'');
+  };
+  ys.forEach((b,i)=>b.addEventListener('click',()=>{hy.add(i);b.classList.add('heard');upd()}));
+  ws.forEach((b,i)=>b.addEventListener('click',()=>{hw.add(i);b.classList.add('heard');upd()}));
+  pad.onchange=()=>{if(S.settings.autoJudge!==false)tr=traceCheck(c.k,pad);upd()};
   upd();
-  $('#next').onclick=()=>{const ks=kstate(c.k);if(!ks.intro){ks.intro=today();}if(!ks.introDone)Zoo.earn(3,0);ks.introDone=true;save();advance(c,'good')};
+  $('#next').onclick=()=>{const ks=kstate(c.k);if(!ks.intro){ks.intro=today();}if(!ks.introDone)earnT(3,0);ks.introDone=true;save();advance(c,'good')};
 }
 
 /* よみ */
@@ -3113,10 +3388,7 @@ const numList=a=>a.map(i=>i+1).join('・');
 function judgeMsg(k,r){
   if(r.reason==='count')return`<div class="feedback ng">「${esc(k)}」は ${r.modelCount}{画|かく}で {書|か}くよ（いまは ${r.userCount}{画|かく}）</div>`;
   if(r.reason==='shape')return`<div class="feedback ng">{形|かたち}が ちがう ところが あるよ。お{手本|てほん}と {比|くら}べてみよう</div>`;
-  const m=[];
-  if(r.orderWrong.length)m.push(r.orderWrong.length>6?'{書き順|かきじゅん}が ちがう ところが たくさん あるよ':`${numList(r.orderWrong)}{画目|かくめ}の {書き順|かきじゅん}が ちがうよ`);
-  if(r.dirWrong.length)m.push(`${numList(r.dirWrong)}{画目|かくめ}は {書|か}く {向|む}きが {反対|はんたい}だよ`);
-  return`<div class="feedback ng">${m.join('<br>')}</div><p class="muted" style="font-size:17px;margin:6px 0 0">{赤|あか}い {線|せん}を よく {見|み}てね</p>`;
+  return`<div class="feedback ng">${orderText(r)}</div><p class="muted" style="font-size:17px;margin:6px 0 0">{赤|あか}い {線|せん}を よく {見|み}てね</p>`;
 }
 const gradeChip=g=>`<div class="judged ${g}">${g==='hard'?IC.sankaku+'{怪|あや}しい':IC.batsu+'{間違|まちが}えた'}</div>`;
 function saveHw(k,img,g){
@@ -3126,10 +3398,13 @@ function saveHw(k,img,g){
   save();
 }
 function traceFix(k,done){
-  $('#after').innerHTML=`<div class="feedback ng">{正|ただ}しい {形|かたち}を 1{回|かい} なぞろう</div>`;
+  $('#after').innerHTML=`<div class="feedback ng">{正|ただ}しい {形|かたち}と {書き順|かきじゅん}で 1{回|かい} なぞろう</div><div class="tmsg" id="tfmsg"></div>`;
   $('#wbox').innerHTML=`<div class="masu">${guideSvg(k,'#F5C4BC')}<canvas></canvas></div>${toolsHtml()}<button class="btn" id="fixed" disabled>なぞれた</button>`;
   const pad=bindPad($('#wbox canvas'));
-  pad.onchange=()=>{$('#fixed').disabled=pad.strokes.length<Math.min(STROKES[k].length,2)};
+  pad.onchange=()=>{
+    if(S.settings.autoJudge===false){$('#fixed').disabled=pad.strokes.length<Math.min(STROKES[k].length,2);return}
+    const t=traceCheck(k,pad);$('#fixed').disabled=!t.ok;const m=$('#tfmsg');m.innerHTML=(t.msg||'')+(t.cls==='ng'?'<br>{全部|ぜんぶ} {消|け}して もう いちど':'');m.className='tmsg '+(t.cls||'');
+  };
   $('#fixed').onclick=done;
 }
 
@@ -3329,16 +3604,20 @@ function showGoji(c){
 }
 
 /* おわり */
-function finishStudy(){
-  const td=today();const day=S.days[td]||(S.days[td]={n:0,rated:[],done:false});day.done=true;
+function finishStudy(reason='done'){
+  const ss=SESSION;timerStop();
+  const endless=ss.mode==='endless';const L=T();
+  const opened=endless?false:completeSlot(ss.slot);
+  const title=endless?'むげんモード おしまい':reason==='time'?'じかんに なったよ！':ss.slot==='am'?'{午前|ごぜん}の {練習|れんしゅう} おしまい！':'{今日|きょう}の {練習|れんしゅう} おしまい！';
   const ups=[...SESSION.touched].filter(k=>stage(k)>=3&&stage(k)>SESSION.before[k]);
   const revived=ups.filter(k=>S.kanji[k]&&S.kanji[k].revivedNew);
   Object.keys(S.kanji).forEach(k=>{if(S.kanji[k].revivedNew)S.kanji[k].revivedNew=false});
-  Zoo.onFinish(calcStreak());save();const zg=Zoo.gain(SESSION.zs);
+  save();const zg=Zoo.gain(SESSION.zs);
   mount(`<div class="sheet done">
     ${hanamaruSvg()}
-    <h2>{今日|きょう}は おしまい！</h2>
-    <p class="muted" style="font-size:20px">${SESSION.rated.size}{問|もん} がんばったね</p>
+    <h2>${title}</h2>
+    <p class="muted" style="font-size:20px">${ss.count||ss.rated.size}{問|もん} がんばったね${!endless&&ss.slot==='am'&&new Date().getHours()<12?'。{午後|ごご}（12じ）からも できるよ':''}</p>
+    ${opened?`<div class="unlock"><span class="inf">∞</span><div><b>むげんモードが ひらいたよ！</b><br>${kyuLabel(L)}を 5{日|か} つづけて がんばったね。ホームから いつでも {練習|れんしゅう}できるよ</div></div>`:''}
     ${ups.length?`<p style="font-size:22px;font-weight:700;margin-top:20px">{図鑑|ずかん}で {星|ほし}が {増|ふ}えたよ</p>
       <div class="newstars flip">${ups.slice(0,14).map((k,i)=>`<div class="tile s${stage(k)}" style="width:96px;animation-delay:${.6+i*.2}s">${k}<span class="st">${starsText(stage(k))}</span>${revived.includes(k)?'<span class="tag rev">{復活|ふっかつ}</span>':''}</div>`).join('')}</div>`:''}
     ${Zoo.gainHtml(zg)}
@@ -3346,7 +3625,7 @@ function finishStudy(){
       ${S.settings.zooHidden?'':'<button class="btn" id="zoo">どうぶつえんへ</button>'}<button class="btn ${S.settings.zooHidden?'':'ghost'}" id="zk">{図鑑|ずかん}を {見|み}る</button><button class="btn ghost" id="hm">ホームへ</button></div>
   </div>`);
   $('#zk').onclick=()=>go('zukan');$('#hm').onclick=()=>Home();$('#zoo')&&($('#zoo').onclick=()=>go('zoo'));
-  drawHanamaru();
+  drawHanamaru();countUp();
 }
 function hanamaruSvg(){
   return`<svg class="hanamaru" viewBox="0 0 200 200" aria-label="はなまる"><path id="hm" d="M100 46c-34 0-58 22-58 52s25 54 58 54 56-22 56-52c0-26-20-44-46-44-22 0-38 14-38 34s15 32 34 32c16 0 26-10 26-24 0-12-9-20-20-20" fill="none" stroke="#E0412E" stroke-width="7" stroke-linecap="round"/>
@@ -3519,7 +3798,7 @@ function mockResult(){
     ${Zoo.gainHtml(zg)}
     <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:16px">${S.settings.zooHidden?'':'<button class="btn ghost" id="zoo">どうぶつえんへ</button>'}<button class="btn" id="hm">ホームへ</button></div></div>`);
   $('#hm').onclick=()=>Home();$('#zoo')&&($('#zoo').onclick=()=>go('zoo'));
-  if(pass)drawHanamaru();
+  if(pass)drawHanamaru();countUp();
 }
 
 /* =================== おうちの かた =================== */
@@ -3537,7 +3816,9 @@ function Parent(forced){
       <h3>設定</h3>
       <label>受検級 <select id="lv">${KYU.map(x=>`<option value="${x}" ${x===L?'selected':''} ${READY[x]?'':'disabled'}>${x}級（${CAT[x].map(c=>CAT_NAME[c]).length}分野）</option>`).join('')}</select></label>
       <label>受検日 <input type="date" id="exam" value="${st.examDate||''}"></label>
-      <label>1日の学習時間の目安 <select id="min">${[5,10,15,20,30,45].map(v=>`<option value="${v}" ${st.minutes==v?'selected':''}>${v}分</option>`).join('')}</select></label>
+      <label>1回の練習時間（タイマー。午前・午後それぞれ） <select id="min">${[5,10,15,20,30,45].map(v=>`<option value="${v}" ${st.minutes==v?'selected':''}>${v}分</option>`).join('')}</select></label>
+      <p>練習は午前（0〜12時）と午後（12時から）に1回ずつできます。タイマーは練習の画面にいる間だけ進み、時間になると、いま解いている問題で終わります。その日の新しい漢字は午前と午後で半分ずつ出します。問題が早く終わったときは、覚えた漢字のおさらいで時間いっぱいまで出します。</p>
+      <p>むげんモード：級ごとに、練習（午前か午後）を5日続けると開き、覚えた漢字の問題をずっと練習できます。いま開いている級：${KYU.filter(x=>S.endless[x]).map(x=>`${x}級`).join('、')||'なし'}（${T()}級は いま${levelStreak(T())}日連続）</p>
       <label>仕上げ期間（新しい漢字を出さない日数） <select id="fin">${[0,2,3,5,7].map(v=>`<option value="${v}" ${st.finishDays==v?'selected':''}>${v}日</option>`).join('')}</select></label>
       <label>新しい漢字を出す順番 <select id="ord"><option value="list" ${st.order==='list'?'selected':''}>配当表の順</option><option value="strokes" ${st.order==='strokes'?'selected':''}>画数の少ない順</option></select></label>
       <label>問題に出す漢字 <select id="scope"><option value="level" ${st.scope!=='all'?'selected':''}>受検級の漢字だけ</option><option value="all" ${st.scope==='all'?'selected':''}>下の級の漢字もふくめる（本番と同じ）</option></select></label>
@@ -3560,7 +3841,7 @@ function Parent(forced){
     </section>
     <section class="sheet">
       <h3>動物園（練習のごほうび）</h3>
-      <p>練習すると「チケット」と「えさ」がたまり、チケットで動物を迎えられます。1問答えると1枚（同じ日に2回目に出た問題は0枚）、新しい漢字で3枚、今日の練習を終えると10枚、★がつくと5〜20枚。えさは1日の練習で最大30個まで。動物園で遊んでもチケットは増えません。</p>
+      <p>練習すると「チケット」と「えさ」がたまり、チケットで動物を迎えられます。1問答えると1枚（同じ時間帯に2回目に出た問題は0枚。むげんモードは同じ日に2回目は0枚）、新しい漢字で3枚、午前・午後の練習を終えるとそれぞれ10枚、★がつくと5〜20枚。えさは最大30個まで。動物園で遊んでもチケットは増えません。</p>
       <label><input type="checkbox" id="zoohide" ${st.zooHidden?'checked':''}> 動物園をかくす（受検直前など、練習に集中させたいとき。かくしている間もチケットはたまります）</label>
       <p>いまのチケット ${Zoo.state().tickets}枚・えさ ${Zoo.state().feed}個・動物 ${Zoo.state().animals.length}頭。受検級を上げると、さばんな（9級）・みずべ（8級）が開きます。</p>
     </section>
@@ -3788,7 +4069,13 @@ function earn(t,f){
 }
 const snap=()=>{const z=Zs();return{t:z.tickets,f:z.feed}};
 const gain=s=>{const z=Zs();return{t:Math.max(0,z.tickets-s.t),f:Math.max(0,z.feed-s.f)}};
-function onFinish(streak){const z=Zs();if(z.doneDay===today())return;z.doneDay=today();earn(10,3);if(streak===3)earn(5,0);if(streak>0&&streak%7===0)earn(15,0)}
+// 練習を終えたとき：午前・午後それぞれ10枚。連続日数のボーナスは1日1回
+function onFinish(streak,slot){
+  const z=Zs(),d=today(),key=d+'-'+(slot||'');z.done=z.done||{};if(z.done[key])return;
+  for(const k in z.done)if(!k.startsWith(d))delete z.done[k];
+  z.done[key]=1;earn(10,3);
+  if(z.doneDay!==d){z.doneDay=d;if(streak===3)earn(5,0);if(streak>0&&streak%7===0)earn(15,0)}
+}
 function onMock(pass){const z=Zs();if(z.mockDay===today())return;z.mockDay=today();earn(10+(pass?20:0),0)}
 function gainHtml(g){
   if(S.settings.zooHidden||(!g.t&&!g.f))return'';
