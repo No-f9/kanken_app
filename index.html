@@ -4129,6 +4129,13 @@ function drawSign(x,y,text,sub,locked,size){
   if(locked){const lx=X+w-2*k,ly=Y-2*k;ctx.fillStyle='#46464A';ctx.fillRect(lx-6*k,ly-2*k,8*k,7*k);ctx.fillStyle='#E8C454';ctx.fillRect(lx-5*k,ly-k,6*k,5*k);ctx.strokeStyle='#46464A';ctx.lineWidth=k;ctx.strokeRect(lx-3.5*k,ly-5.5*k,4*k,4*k)}
   ctx.restore();return{X,Y,w,h};
 }
+const POOP_PX=['...1...','..121..','.12321.','.12221.','1232321','1222221','.11111.'],POOP_C={1:'#2C1A12',2:'#6E4428',3:'#A06A42'};
+function poopBadge(x,y,T){ // うんちが ある しるし（エリアの図の 看板の よこ）
+  const b=Math.abs(Math.sin(T*3+1))*2,cx=x*K,cy=(y-b)*K;
+  ctx.save();ctx.fillStyle='#fff';ctx.strokeStyle='#8A5A34';ctx.lineWidth=3;ctx.beginPath();ctx.arc(cx,cy,12,0,Math.PI*2);ctx.fill();ctx.stroke();
+  const u=2.4;POOP_PX.forEach((row,j)=>[...row].forEach((c,i)=>{if(c==='.')return;ctx.fillStyle=POOP_C[c];ctx.fillRect(cx+(i-3.5)*u,cy+(j-3.8)*u,u+.3,u+.3)}));
+  ctx.restore();
+}
 function bang(x,y,T){ // えさを まっている しるし
   const b=Math.abs(Math.sin(T*3))*2;
   ctx.save();ctx.fillStyle='#fff';ctx.strokeStyle='#E0412E';ctx.lineWidth=3;
@@ -4233,6 +4240,7 @@ function drawArea(T){
     const sp=s.key===SPECIAL[curArea],here=penOf(curArea,s.key);
     const b=sp&&!here.length?drawSign(s.x,s.y,'？','スペシャル',false,15):drawSign(s.x,s.y,TITLE[s.key]||s.text,sp?'★スペシャル':null,false,15);
     if(here.some(x=>!fedToday(x)))bang((b.X+b.w)/K+2,b.Y/K+2,T);
+    if(here.length&&z.day.poop[`${curArea}-${s.key}`])poopBadge(b.X/K-2,b.Y/K+2,T);
   }
   drawSign(56,40,AREA_NAME[curArea],null,false,22);
 }
