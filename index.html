@@ -108,6 +108,27 @@ button:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--sky);outli
 .zgoal{font-size:14px;font-weight:700;color:var(--ink2);padding:4px 10px;border-radius:999px}
 .zgoal[aria-pressed=true]{color:#B7790A;background:#FFF6DA}
 .zsp{font-size:15px;line-height:1.6}
+.zline.mission{color:#8A5A00}.zline.mission b{color:#B7790A}.zline .ready{color:var(--red)}
+.zmission{width:min(600px,100%)}
+.zmission h3{font-size:26px;margin:4px 48px 6px 0;display:flex;align-items:center;gap:10px}
+.zmission .q{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:50%;background:#FFF6DA;border:3px solid var(--gold);color:#B7790A;font-weight:900}
+.zmission>p{font-size:17px;line-height:1.6;margin:4px 0}
+.zmlist{list-style:none;padding:0;margin:14px 0;display:flex;flex-direction:column;gap:12px}
+.zmlist li{display:flex;gap:14px;align-items:flex-start;border:2px solid var(--grid);border-radius:16px;padding:12px 16px}
+.zmlist li>div{flex:1;min-width:0}
+.zmlist li b{font-size:18px;line-height:1.5}
+.zmlist .no{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--paper);border:2px solid var(--rule);font-weight:900;font-size:18px}
+.zmlist li.ok{border-color:var(--cover);background:#EEF7F1}
+.zmlist li.ok .no{background:var(--cover);border-color:var(--cover);color:#fff}
+.zbar{height:12px;border-radius:999px;background:#fff;border:2px solid var(--grid);overflow:hidden;margin:6px 0 2px}
+.zbar i{display:block;height:100%;background:var(--gold);border-radius:999px}
+.zmlist li.ok .zbar i{background:var(--cover)}
+.zmlist small{font-size:15px;font-weight:700;color:var(--ink2)}
+.zgoal#zmis{margin-left:8px}
+.zclear{display:flex;flex-direction:column;align-items:center;gap:8px;margin:16px 0 0;font-size:19px;font-weight:800;animation:zpop .6s cubic-bezier(.3,1.6,.5,1) both .6s}
+.zclear .tag{background:var(--gold);color:#fff;border-radius:999px;padding:3px 12px;margin-right:10px;font-size:15px}
+.zready{margin:12px 0 0;font-size:20px;font-weight:900;color:var(--red);animation:zpop .6s cubic-bezier(.3,1.6,.5,1) both .9s}
+
 .zsex{display:flex;gap:12px;justify-content:center;margin:10px 0}
 .zsex button{min-width:130px;min-height:56px;border-radius:999px;border:3px solid var(--rule);font-size:21px;font-weight:800;background:var(--sheet)}
 .zsex button[aria-pressed=true]{border-color:var(--cover);background:#E3F1E8}
@@ -3841,6 +3862,7 @@ function Parent(forced){
     </section>
     <section class="sheet">
       <h3>動物園（練習のごほうび）</h3>
+      <p>エリアごとのミッション（動物5種類をむかえる・その級の漢字をぜんぶ一度は★にする・その級の模擬テストで満点2回）をやりとげると、スペシャル動物がやってきます。何が来るかは来るまでひみつです。</p>
       <p>練習すると「チケット」と「えさ」がたまり、チケットで動物を迎えられます。1問答えると1枚（同じ時間帯に2回目に出た問題は0枚。むげんモードは同じ日に2回目は0枚）、新しい漢字で3枚、午前・午後の練習を終えるとそれぞれ10枚、★がつくと5〜20枚。えさは最大30個まで。動物園で遊んでもチケットは増えません。</p>
       <label><input type="checkbox" id="zoohide" ${st.zooHidden?'checked':''}> 動物園をかくす（受検直前など、練習に集中させたいとき。かくしている間もチケットはたまります）</label>
       <p>いまのチケット ${Zoo.state().tickets}枚・えさ ${Zoo.state().feed}個・動物 ${Zoo.state().animals.length}頭。受検級を上げると、さばんな（9級）・みずべ（8級）が開きます。</p>
@@ -4067,8 +4089,10 @@ function earn(t,f){
   const d=today();const e=z.log[d]||(z.log[d]={t:0,f:0});e.t+=t;e.f+=f;
   const ks=Object.keys(z.log).sort();while(ks.length>30)delete z.log[ks.shift()];
 }
-const snap=()=>{const z=Zs();return{t:z.tickets,f:z.feed}};
-const gain=s=>{const z=Zs();return{t:Math.max(0,z.tickets-s.t),f:Math.max(0,z.feed-s.f)}};
+const snap=()=>{const z=Zs();return{t:z.tickets,f:z.feed,ms:missionKeys()}};
+const gain=s=>{const z=Zs();const now=missionKeys(),before=new Set(s.ms||[]);
+  const cleared=now.filter(k=>!before.has(k)).map(k=>{const[a,id]=k.split(':');return missions(a).find(m=>m.id===id).label});
+  return{t:Math.max(0,z.tickets-s.t),f:Math.max(0,z.feed-s.f),cleared,ready:ART.some(a=>openAreas().has(a)&&specialReady(a))}};
 // 練習を終えたとき：午前・午後それぞれ10枚。連続日数のボーナスは1日1回
 function onFinish(streak,slot){
   const z=Zs(),d=today(),key=d+'-'+(slot||'');z.done=z.done||{};if(z.done[key])return;
@@ -4078,8 +4102,53 @@ function onFinish(streak,slot){
 }
 function onMock(pass){const z=Zs();if(z.mockDay===today())return;z.mockDay=today();earn(10+(pass?20:0),0)}
 function gainHtml(g){
-  if(S.settings.zooHidden||(!g.t&&!g.f))return'';
-  return`<div class="zgain"><span class="tk">チケット <b>+${g.t}</b>まい</span>${g.f?`<span class="fd">えさ <b>+${g.f}</b>こ</span>`:''}</div>`;
+  if(S.settings.zooHidden)return'';
+  return(g.cleared&&g.cleared.length?`<div class="zclear">${g.cleared.map(l=>`<div><span class="tag">ミッション クリア！</span>${l}</div>`).join('')}</div>`:'')+
+    (g.ready?'<p class="zready">どうぶつえんに だれかが やってきたみたい！ 見に いこう</p>':'')+
+    (g.t||g.f?`<div class="zgain"><span class="tk">チケット <b>+${g.t}</b>まい</span>${g.f?`<span class="fd">えさ <b>+${g.f}</b>こ</span>`:''}</div>`:'');
+}
+
+/* ---------- ミッション：スペシャル動物は、エリアの級の ミッションを ぜんぶ やりとげると やってくる ----------
+   ① エリアの 5しゅるいを むかえる ② その級の漢字を ぜんぶ ★（一度でも）にする ③ その級（か それより上の級）の もぎテストで 満点を 2回
+   何が来るかは、来るまで ひみつ */
+function missions(area){
+  const z=Zs(),L=LV[area],ks=LEVELS[L]||[];
+  const sp=LIST[area].filter(k=>z.animals.some(x=>x.area===area&&x.key===k)).length;
+  const st=ks.filter(k=>{const a=(S.kanji[k]||{}).starAt||{};return !!a[3]}).length;
+  const pf=S.mocks.filter(m=>{const l=m.level||10;return l<=L&&MOCKCFG[l]&&m.score>=MOCKCFG[l].max}).length;
+  return[
+    {id:'zoo',label:`${AREA_NAME[area]}の どうぶつ 5しゅるいを むかえる`,n:sp,max:LIST[area].length},
+    {id:'star',label:`${L}きゅうの かんじを ぜんぶ ★に する`,n:st,max:ks.length},
+    {id:'mock',label:`${L}きゅうの もぎテストで まんてんを 2かい とる`,n:Math.min(2,pf),max:2},
+  ].map(m=>Object.assign(m,{done:m.n>=m.max}));
+}
+const specialHere=area=>Zs().animals.some(x=>x.area===area&&x.key===SPECIAL[area]);
+const specialReady=area=>!specialHere(area)&&missions(area).every(m=>m.done);
+const missionKeys=()=>{const op=openAreas();return ART.flatMap(a=>!op.has(a)||specialHere(a)?[]:missions(a).filter(m=>m.done).map(m=>`${a}:${m.id}`))};
+function missionModal(area){
+  const ms=missions(area),n=ms.filter(m=>m.done).length;
+  const m=document.createElement('div');m.className='modal';
+  m.innerHTML=`<div class="page zmission" role="dialog"><button class="iconbtn close" aria-label="{閉|と}じる">${IC.close}</button>
+    <h3><span class="q">？</span>スペシャル どうぶつ</h3>
+    <p>ミッションを ぜんぶ やりとげると、${AREA_NAME[area]}に なにかが やってくるよ。なにが くるかは おたのしみ！</p>
+    <ol class="zmlist">${ms.map((x,i)=>`<li class="${x.done?'ok':''}"><span class="no">${x.done?'✓':i+1}</span><div><b>${x.label}</b>
+      <div class="zbar"><i style="width:${Math.round(x.n/x.max*100)}%"></i></div><small>${x.n} / ${x.max}${x.done?'　クリア！':''}</small></div></li>`).join('')}</ol>
+    <p class="muted">クリア ${n} / ${ms.length}</p></div>`;
+  document.body.appendChild(m);
+  m.querySelector('.close').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};
+}
+/* ミッションを やりとげた エリアに、スペシャル動物を むかえる（どうぶつえんを ひらいたときに 1ぴきずつ） */
+function arriveSpecial(){
+  const z=Zs(),op=openAreas();
+  const area=ART.find(a=>op.has(a)&&specialReady(a));if(!area)return false;
+  const sk=SPECIAL[area];const ns={id:z.seq++,area,key:sk,sex:'s',name:'',at:today(),fed:null,streak:0};z.animals.push(ns);save();
+  celebrate(`ミッション クリア！<br>スペシャル どうぶつの ${TITLE[sk]}が やってきた！`,'s',area,sk,ns);
+  return true;
+}
+function missionLine(){
+  const op=openAreas();const a=ART.find(x=>op.has(x)&&!specialHere(x));if(!a)return'';
+  const ms=missions(a),left=ms.filter(m=>!m.done).length;
+  return left?`？スペシャル（${AREA_NAME[a]}）まで ミッション あと <b>${left}</b>つ`:`<span class="ready">${AREA_NAME[a]}に だれかが やってきたみたい！</span>`;
 }
 
 /* ---------- ホームのカード ---------- */
@@ -4093,7 +4162,7 @@ function card(){
   return`<div class="sheet zoo-peek" id="zooc" role="button" tabindex="0">
     <h3>どうぶつえん <span>チケット <b>${z.tickets}</b>まい・えさ <b>${z.feed}</b>こ</span></h3>
     <div class="zmini"><img src="${DIR}views/overview.png" alt=""></div>
-    <p class="zline">${goalLine()||(z.animals.length?`どうぶつ ${z.animals.length}とう・きょうの おきゃく ${guests()}にん`:'チケットで どうぶつを むかえよう')}</p>
+    ${goalLine()?`<p class="zline">${goalLine()}</p>`:missionLine()?`<p class="zline mission">${missionLine()}</p>`:`<p class="zline">${z.animals.length?`どうぶつ ${z.animals.length}とう・きょうの おきゃく ${guests()}にん`:'チケットで どうぶつを むかえよう'}</p>`}
     ${hungry?'<p class="zline hungry">えさを まっている どうぶつが いるよ</p>':''}
   </div>`;
 }
@@ -4185,11 +4254,12 @@ async function open(v='overview',area=null,key=null,opt={}){
   $('#zload').hidden=true;
   if(z.grant>0&&!z.grantShown){z.grantShown=true;save();toast(`これまでの ★の ぶん、チケットを ${z.grant}まい もらったよ！`)}
   bar();
+  if(!opt.arrive)arriveSpecial();
 }
 function bar(){
   const z=Zs();if(!$('#ztk'))return;
   $('#ztk').textContent=z.tickets;$('#zfd').textContent=z.feed;$('#zgs').textContent=guests();$('#zph').textContent=PHASE_NAME[phase()];
-  $('#zcrumb').textContent=view==='overview'?'どうぶつえん':view==='area'?`どうぶつえん ＞ ${AREA_NAME[curArea]}`:`${AREA_NAME[curArea]} ＞ ${TITLE[curKey]}${P&&P.special?'（スペシャル）':''}`;
+  $('#zcrumb').textContent=view==='overview'?'どうぶつえん':view==='area'?`どうぶつえん ＞ ${AREA_NAME[curArea]}`:`${AREA_NAME[curArea]} ＞ ${curKey===SPECIAL[curArea]?`${specialHere(curArea)?TITLE[curKey]:'？'}（スペシャル）`:TITLE[curKey]}`;
 }
 function ctrl(html){$('#zctrl').innerHTML=html}
 
@@ -4238,7 +4308,7 @@ function drawArea(T){
   tint(T);
   for(const s of M.signs){
     const sp=s.key===SPECIAL[curArea],here=penOf(curArea,s.key);
-    const b=sp&&!here.length?drawSign(s.x,s.y,'？','スペシャル',false,15):drawSign(s.x,s.y,TITLE[s.key]||s.text,sp?'★スペシャル':null,false,15);
+    const b=sp&&!here.length?drawSign(s.x,s.y,'？',`ミッション ${missions(curArea).filter(m=>m.done).length}/3`,false,15):drawSign(s.x,s.y,TITLE[s.key]||s.text,sp?'★スペシャル':null,false,15);
     if(here.some(x=>!fedToday(x)))bang((b.X+b.w)/K+2,b.Y/K+2,T);
     if(here.length&&z.day.poop[`${curArea}-${s.key}`])poopBadge(b.X/K-2,b.Y/K+2,T);
   }
@@ -4247,7 +4317,9 @@ function drawArea(T){
 function tapArea(p){
   const M=META.areas[curArea];const c=gridAt(M,p.x,p.y);let k=c==='.'?-1:+c;
   if(k<0)for(const s of M.signs)if(Math.abs(p.x-s.x)<30&&p.y<s.y+4&&p.y>s.y-24)k=s.k;
-  if(k>=0)open('pen',curArea,M.keys[k]);
+  if(k<0)return;
+  if(M.keys[k]===SPECIAL[curArea]&&!specialHere(curArea)){missionModal(curArea);return}
+  open('pen',curArea,M.keys[k]);
 }
 
 /* ---------- 区画（動物が動く） ---------- */
@@ -4347,7 +4419,7 @@ async function showPen(area,key,opt){
   penCtrl();
   const sp=key===SPECIAL[area];
   if(!A.length){
-    msg(sp?`<b>？ スペシャル どうぶつ</b><br>${AREA_NAME[area]}の 5しゅるいを ぜんぶ むかえて、みんなに 7{日|にち} つづけて えさを あげると、やってくるよ`
+    msg(sp?`<b>？ スペシャル どうぶつ</b><br>ミッションを ぜんぶ やりとげると、やってくるよ`
           :`まだ だれも いないよ。<br>チケット ${PRICE[key]}まいで ${TITLE[key]}を むかえられるよ`);
   }else if(!opt.arrive){
     const a=P.act;
@@ -4398,19 +4470,13 @@ function feed(){
     setTimeout(()=>events(curArea,curKey),3500);
   },600);
 }
-/* あかちゃん・スペシャル */
+/* あかちゃん（オスと メスに 7日 つづけて えさを あげると 生まれる） */
 function events(area,key){
   const z=Zs();const here=penOf(area,key);
   const m=here.find(x=>x.sex==='m'),f=here.find(x=>x.sex==='f');
   if(m&&f&&!here.some(x=>x.sex==='b')&&(m.streak||0)>=7&&(f.streak||0)>=7&&m.fed===today()&&f.fed===today()){
     const nb={id:z.seq++,area,key,sex:'b',name:'',at:today(),fed:today(),streak:1};z.animals.push(nb);save();
     celebrate(`${TITLE[key]}の あかちゃんが {生|う}まれたよ！`,'b',area,key,nb);return;
-  }
-  const sk=SPECIAL[area];
-  if(!z.animals.some(x=>x.area===area&&x.key===sk)&&LIST[area].every(k=>z.animals.some(x=>x.area===area&&x.key===k))&&
-     z.animals.filter(x=>x.area===area&&(x.sex==='m'||x.sex==='f')).every(x=>(x.streak||0)>=7&&x.fed===today())){
-    const ns={id:z.seq++,area,key:sk,sex:'s',name:'',at:today(),fed:today(),streak:1};z.animals.push(ns);save();
-    celebrate(`スペシャル どうぶつの ${TITLE[sk]}が やってきた！`,'s',area,sk,ns);
   }
 }
 
@@ -4641,8 +4707,9 @@ async function adopt(area,only){
           <div class="zhave">${hm?'<span class="m">♂ いる</span>':''}${hf?'<span class="f">♀ いる</span>':''}${!hm&&!hf?'<span>まだ いない</span>':''}</div>
           ${full?'<div class="zfull">オスも メスも いるよ</div>':need>0?`<div class="zneed">あと ${need}まい</div>`:`<button class="btn small" data-k="${k}">むかえる</button>`}
           ${full?'':`<button class="zgoal" data-goal="${k}" aria-pressed="${goal}">${goal?'★ もくひょう':'☆ もくひょうに する'}</button>`}</div>`}).join('')}</div>
-      <p class="muted zsp">★ スペシャル どうぶつ（${TITLE[SPECIAL[area]]}）は チケットでは むかえられないよ。5しゅるいを ぜんぶ むかえて、みんなに 7{日|にち} つづけて えさを あげると やってくるよ。</p></div>`;
+      ${only?'':`<p class="muted zsp">★ スペシャル どうぶつは チケットでは むかえられないよ。ミッションを ぜんぶ やりとげると、なにかが やってくるよ。<button class="zgoal" id="zmis">ミッションを 見る</button></p>`}</div>`;
     m.querySelector('.close').onclick=close;
+    $('#zmis',m)&&($('#zmis',m).onclick=()=>{close();missionModal(area)});
     m.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>naming(b.dataset.k));
     m.querySelectorAll('[data-goal]').forEach(b=>b.onclick=()=>{const z=Zs(),g=`${area}-${b.dataset.goal}`;z.goal=z.goal===g?null:g;save();toast(z.goal?`${TITLE[b.dataset.goal]}を もくひょうに したよ`:'もくひょうを やめたよ');list()});
     thumbs(m);
@@ -4704,7 +4771,7 @@ async function book(){
   m.querySelector('.close').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};
 }
 
-return{card,bindCard,open,snap,gain,gainHtml,earn,onFinish,onMock,state:Zs};
+return{card,bindCard,open,snap,gain,gainHtml,earn,onFinish,onMock,missions,state:Zs};
 })();
 
 /* ---------- 起動：問題データを読み込む ---------- */
