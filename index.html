@@ -108,6 +108,8 @@ button:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--sky);outli
 .zgoal{font-size:14px;font-weight:700;color:var(--ink2);padding:4px 10px;border-radius:999px}
 .zgoal[aria-pressed=true]{color:#B7790A;background:#FFF6DA}
 .zsp{font-size:15px;line-height:1.6}
+.pace{background:#EEF7F1;border-radius:12px;padding:10px 14px;line-height:1.7}
+.pace.warn{background:#FDECEA;color:#A92E20}
 .zline.mission{color:#8A5A00}.zline.mission b{color:#B7790A}.zline .ready{color:var(--red)}
 .zmission{width:min(600px,100%)}
 .zmission h3{font-size:26px;margin:4px 48px 6px 0;display:flex;align-items:center;gap:10px}
@@ -2594,13 +2596,17 @@ const RMAP={again:FSRS.Rating.Again,hard:FSRS.Rating.Hard,good:FSRS.Rating.Good}
 
 /* ---------- 保存 ---------- */
 function defaultState(){return{
-  settings:{level:10,examDate:'2026-11-06',minutes:15,finishDays:3,order:'list',includeLower:false,scope:'level',zooHidden:false,autoJudge:true},
+  settings:{level:10,examDate:'2026-11-06',minutes:15,finishDays:14,order:'list',includeLower:false,scope:'level',zooHidden:false,autoJudge:true},
   items:{},kanji:{},days:{},hwlog:[],mocks:[],plan:null,priority:[]};}
 let S=load(STORE)||defaultState();
 let HW=load(HWSTORE)||{first:{},last:{}};
 S.settings=Object.assign(defaultState().settings,S.settings||{});
+// 仕上げ期間の初期値を 3日→14日に（受検日が 14日以内に せまっているときは そのまま。すぎてから 14日に）
+if(!S.mig3){const ex=S.settings.examDate?parseYmd2(S.settings.examDate):null,dd=ex?Math.round((ex-new Date())/864e5):-1;
+  if(dd<0||dd>14){if(S.settings.finishDays===3)S.settings.finishDays=14;S.mig3=1}}
 ['items','kanji','days'].forEach(k=>S[k]=S[k]||{});
 ['hwlog','mocks','priority'].forEach(k=>S[k]=S[k]||[]);
+function parseYmd2(s){const[a,b,c]=String(s).split('-').map(Number);return new Date(a,b-1,c)}
 function load(key){try{const v=localStorage.getItem(key);return v?JSON.parse(v):null}catch(e){return null}}
 function save(){
   try{localStorage.setItem(STORE,JSON.stringify(S));localStorage.setItem(HWSTORE,JSON.stringify(HW))}
@@ -2713,28 +2719,68 @@ function dueLists(){
   return{rev,fresh:fresh.map(x=>x[0])};
 }
 function budget(){return Math.round(S.settings.minutes*60/PER_CARD_SEC)}
+/* ---------- 1日に出す新しい漢字の数 ----------
+   練習時間から決める：15分の練習1回につき 1.5字（1日1回なら2字、午前・午後なら3字）。
+   期限の過ぎた復習が たまったり、ここ数日 まちがいが多かったりしたら へらす（復習を先に）。
+   受検日に まにあわないときも 量は ふやさず、おうちの方の画面に 見込みを出す。
+   （9級160字を 11月から2月の受検日まで 1日ずつ動かした試算で、いちばん 無理がなかった決め方） */
+function practiceRate(){ // ここ1週間で、練習した日の 1日あたりの回数（1 か 2）
+  let days=0,ses=0;const d=new Date();
+  for(let i=1;i<=7;i++){d.setDate(d.getDate()-1);const v=S.days[ymd(d)];if(!v||!v.n)continue;days++;
+    ses+=Math.max(1,v.slots?['am','pm'].filter(x=>v.slots[x]&&(v.slots[x].done||v.slots[x].n>0)).length:1)}
+  return days&&ses/days>=1.5?2:1;
+}
+function overdueCount(){ // きのうまでに 期限が来たのに まだの 復習
+  const t0=new Date();t0.setHours(0,0,0,0);let n=0;
+  for(const id in S.items){const it=S.items[id];if(!it||!it.reps||new Date(it.card.due)>=t0)continue;
+    if(id[0]==='B'){if(bankById(id))n++;continue}
+    const[k,t]=id.split(':');if(S.kanji[k]&&S.kanji[k].intro&&KD[k]&&activeKinds(k).includes(t))n++}
+  return n;
+}
+function recentMiss(){ // ここ3日の まちがいの わりあい（答えが15問より少なければ 0）
+  let n=0,m=0;const d=new Date();
+  for(let i=1;i<=3;i++){d.setDate(d.getDate()-1);const v=S.days[ymd(d)];if(v&&v.miss!=null){n+=v.n;m+=v.miss}}
+  return n>=15?m/n:0;
+}
+function newPace(){
+  const ses=practiceRate(),min=+S.settings.minutes||15;
+  const base=Math.max(1,Math.min(5,Math.round(1.5*ses*min/15)));
+  const od=overdueCount(),miss=recentMiss();let n=base,why='';
+  if(od>50){n=0;why='overdue'}else if(od>20){n=Math.min(base,1);why='overdue'}else if(miss>.25){n=Math.min(base,1);why='miss'}
+  return{base,n,ses,min,od,miss,why};
+}
+/* 受検級の のこりに ぜんぶ出会う見込み（毎日 練習した場合） */
+function paceForecast(){
+  const L=T(),remain=LEVELS[L].filter(k=>KD[k]&&!(S.kanji[k]&&S.kanji[k].intro)).length,p=newPace(),ei=examInfo();
+  if(!remain)return{remain,p};
+  // 1週間以上 続けていたら、じっさいに 出会えた ペース（ここ14日の平均）も 見る。ブレーキや 休みの日で 遅くなる ぶん
+  const td=today(),ds=LEVELS[L].map(k=>S.kanji[k]&&S.kanji[k].intro).filter(Boolean).sort();
+  let rate=p.base,seen=null;
+  if(ds.length){const span=dayDiff(parseYmd(ds[0]),new Date())+1;
+    if(span>=7){const w=Math.min(14,span),from=new Date();from.setDate(from.getDate()-w+1);const f0=ymd(from);
+      seen=ds.filter(d=>d>=f0&&d<=td).length/w;rate=Math.max(.3,Math.min(p.base,seen))}}
+  const end=new Date();end.setDate(end.getDate()+Math.ceil(remain/rate)-1);
+  let target=null,late=null;
+  if(ei.future){target=new Date(ei.ex);target.setDate(target.getDate()-S.settings.finishDays);late=dayDiff(target,end)}
+  return{remain,p,end,target,late,seen};
+}
 function planToday(){
   const td=today();
-  if(S.plan&&S.plan.date===td&&S.plan.level===T())return S.plan;
-  const B=budget();const {rev,fresh}=dueLists();
-  const order=introOrder();const ei=examInfo();
-  let perDay;
-  const remainLevel=LEVELS[T()].filter(k=>KD[k]&&!(S.kanji[k]&&S.kanji[k].intro)).length;
-  if(ei.future){
-    const span=Math.max(1,ei.days-S.settings.finishDays);
-    perDay=ei.finishing?Math.min(remainLevel,10):Math.ceil(remainLevel/span);
-  }else perDay=5;
-  const load=rev.length+Math.min(fresh.length,FRESH_PER_DAY);
-  const capacity=Math.floor((B-load)/4);
-  let n=rev.length>B?0:Math.min(Math.max(perDay,0),Math.max(2,capacity));
+  if(S.plan&&S.plan.date===td&&S.plan.level===T()&&S.plan.v===2)return S.plan;
+  const B=budget();const {rev,fresh}=dueLists();const order=introOrder();
+  const p=newPace();
+  const metToday=Object.keys(S.kanji).filter(k=>S.kanji[k].intro===td&&S.kanji[k].introDone).length;  // 作り直したときは、今日 出会った分を引く
+  let n=Math.max(0,p.n-metToday);
+  if(rev.length>B*p.ses)n=0;   // 今日の復習だけで 時間いっぱいなら 出さない
   n=Math.min(n,order.length);
+  const load=rev.length+Math.min(fresh.length,FRESH_PER_DAY);
   // 問題バンク：答えの漢字に出会ったものから、1日 数問ずつ
   let nb=0;const newB=[];
   if(T()<=8){
-    nb=Math.max(2,Math.min(6,Math.floor((B-load-n*4)/2)));
+    nb=Math.max(2,Math.min(6,Math.floor((B*p.ses-load-n*4)/2)));
     for(const b of bankList(T())){if(newB.length>=nb)break;if(S.items[b.id])continue;if(bankUnlocked(b))newB.push(b.id)}
   }
-  S.plan={date:td,level:T(),newK:order.slice(0,n),newB};save();
+  S.plan={v:2,date:td,level:T(),newK:order.slice(0,n),newB,pace:p};save();
   return S.plan;
 }
 function buildSession(sl=slotNow()){
@@ -2744,11 +2790,7 @@ function buildSession(sl=slotNow()){
   let {rev,fresh}=dueLists();
   rev=rev.filter(id=>!doneToday.has(id));fresh=fresh.filter(id=>!doneToday.has(id));
   let newB=plan.newB.filter(id=>!doneToday.has(id)&&!(S.items[id]&&S.items[id].reps>0));
-  // 新しい漢字・新しい問題は、午前と午後で半分ずつ（午前にやらなかった分は午後に出る）
-  if(sl==='am'){
-    const nk=plan.newK.length-pending.length;pending=pending.slice(0,Math.max(0,Math.ceil(plan.newK.length/2)-nk));
-    const nb=plan.newB.length-newB.length;newB=newB.slice(0,Math.max(0,Math.ceil(plan.newB.length/2)-nb));
-  }
+  // 新しい漢字は、その日 最初の練習で まとめて出す（時間切れで のこった分は 次の練習で）
   const room=Math.max(6,B-pending.length*3-newB.length);
   rev=rev.slice(0,room);
   fresh=fresh.slice(0,Math.min(FRESH_PER_DAY,Math.max(0,room-rev.length)));
@@ -2796,7 +2838,7 @@ function rate(id,g){
     for(const s of [3,4,5])if(st>=s&&!ks.starAt[s]){ks.starAt[s]=now.toISOString();earnT({3:5,4:10,5:20}[s],0)}
     if(ks.weak&&st>=3&&!ks.revived){ks.revived=true;ks.revivedNew=true}
   }
-  const day=dayRec();day.n++;
+  const day=dayRec();day.n++;day.miss=(day.miss||0)+(g==='again'?1:0);
   const first=!day.rated.includes(id);if(first)day.rated.push(id);
   // チケット：午前・午後それぞれで 1問1枚（同じ時間帯に2回目は0枚）。むげんモードは 1日に1回まで
   const ss=SESSION;
@@ -3823,6 +3865,16 @@ function mockResult(){
 }
 
 /* =================== おうちの かた =================== */
+const mdJ=d=>`${d.getMonth()+1}月${d.getDate()}日`;
+function paceHtml(){
+  const f=paceForecast(),p=f.p,L=T();
+  const how=`1日の新しい漢字：<b>${p.n}字</b>（ここ1週間は${p.ses===2?'午前・午後の2回':'1日1回'}練習、1回${p.min}分なので${p.base}字${p.why==='overdue'?`。期限の過ぎた復習が${p.od}問たまっているので、復習を先にしています`:p.why==='miss'?`。ここ数日まちがいが多い（${Math.round(p.miss*100)}%）ので、少なめにしています`:''}）`;
+  if(!f.remain)return`<p class="pace">${how}。${L}級の漢字には、もう全部出会っています。</p>`;
+  let fc=`${f.seen!=null?`ここ2週間は1日あたり平均${f.seen.toFixed(1)}字でした。`:''}このまま毎日練習すると、${L}級の残り${f.remain}字に全部出会うのは<b>${mdJ(f.end)}ごろ</b>`;
+  if(f.target){fc+=f.late<=-7?`（仕上げ期間に入る${mdJ(f.target)}までに間に合います）。`:f.late<=0?`（仕上げ期間に入る${mdJ(f.target)}にぎりぎり間に合う見込みです）。`:`。仕上げ期間に入る${mdJ(f.target)}より${f.late}日遅れます。`}else fc+='。';
+  const warn=f.target&&f.late>0?`<p class="pace warn">受検日までに余裕を持って仕上げるには、${p.ses===1?'午後も練習する（1日3字になります）、':''}1回の練習時間を延ばす、仕上げ期間を短くする、受検日を次の回にする、のどれかを考えてください。新しい漢字を一度に増やすと、復習が回らなくなって間違いが増えるので、自動では増やしません。</p>`:'';
+  return`<p class="pace">${how}。${fc}</p>${warn}`;
+}
 function Parent(forced){
   const st=S.settings;const ei=examInfo();const L=T();
   const n=Object.values(S.days).reduce((a,d)=>a+(d.n||0),0);
@@ -3838,15 +3890,16 @@ function Parent(forced){
       <label>受検級 <select id="lv">${KYU.map(x=>`<option value="${x}" ${x===L?'selected':''} ${READY[x]?'':'disabled'}>${x}級（${CAT[x].map(c=>CAT_NAME[c]).length}分野）</option>`).join('')}</select></label>
       <label>受検日 <input type="date" id="exam" value="${st.examDate||''}"></label>
       <label>1回の練習時間（タイマー。午前・午後それぞれ） <select id="min">${[5,10,15,20,30,45].map(v=>`<option value="${v}" ${st.minutes==v?'selected':''}>${v}分</option>`).join('')}</select></label>
-      <p>練習は午前（0〜12時）と午後（12時から）に1回ずつできます。タイマーは練習の画面にいる間だけ進み、時間になると、いま解いている問題で終わります。その日の新しい漢字は午前と午後で半分ずつ出します。問題が早く終わったときは、覚えた漢字のおさらいで時間いっぱいまで出します。</p>
+      <p>練習は午前（0〜12時）と午後（12時から）に1回ずつできます。タイマーは練習の画面にいる間だけ進み、時間になると、いま解いている問題で終わります。その日の新しい漢字は、その日最初の練習でまとめて出します（時間切れで残った分は次の練習で）。問題が早く終わったときは、覚えた漢字のおさらいで時間いっぱいまで出します。</p>
+      ${paceHtml()}
       <p>むげんモード：級ごとに、練習（午前か午後）を5日続けると開き、覚えた漢字の問題をずっと練習できます。いま開いている級：${KYU.filter(x=>S.endless[x]).map(x=>`${x}級`).join('、')||'なし'}（${T()}級は いま${levelStreak(T())}日連続）</p>
-      <label>仕上げ期間（新しい漢字を出さない日数） <select id="fin">${[0,2,3,5,7].map(v=>`<option value="${v}" ${st.finishDays==v?'selected':''}>${v}日</option>`).join('')}</select></label>
+      <label>仕上げ期間（受検日の何日前までに、新しい漢字を出し終えたいか） <select id="fin">${[...new Set([0,3,7,14,21,st.finishDays])].sort((a,b)=>a-b).map(v=>`<option value="${v}" ${st.finishDays==v?'selected':''}>${v}日</option>`).join('')}</select></label>
       <label>新しい漢字を出す順番 <select id="ord"><option value="list" ${st.order==='list'?'selected':''}>配当表の順</option><option value="strokes" ${st.order==='strokes'?'selected':''}>画数の少ない順</option></select></label>
       <label>問題に出す漢字 <select id="scope"><option value="level" ${st.scope!=='all'?'selected':''}>受検級の漢字だけ</option><option value="all" ${st.scope==='all'?'selected':''}>下の級の漢字もふくめる（本番と同じ）</option></select></label>
       <p>「受検級の漢字だけ」では、対義語・同音異字などの問題や模擬テストに、下の級の漢字はアプリで出会ったものだけが答えとして出ます。下の級をアプリで学んでいない場合（途中の級から始めた場合）はこちらがおすすめです。問題文の中には、下の級の漢字が読みとして出てきます。</p>
       <label><input type="checkbox" id="low" ${st.includeLower?'checked':''}> 受検級の漢字が終わったら、下の級で未学習の漢字も出す</label>
       <label><input type="checkbox" id="autojudge" ${st.autoJudge!==false?'checked':''}> 書いた字を自動で判定する（画数・書き順・だいたいの形。画数か形が違えば「間違えた」、書き順の間違いが3か所以下なら「怪しい」、4か所以上なら「間違えた」。合っていれば、とめ・はね・はらいを本人が見比べて「できた／怪しい」を選びます）</label>
-      <p>${L}級の出題分野：${CAT[L].map(c=>CAT_NAME[c]).join('、')}。受検日までの日数から、1日に出す新しい漢字の数を自動で決めます。級を上げても、これまでの漢字の復習は続きます。</p>
+      <p>${L}級の出題分野：${CAT[L].map(c=>CAT_NAME[c]).join('、')}。級を上げても、これまでの漢字の復習は続きます。</p>
       <button class="btn ghost small" id="replan">今日の計画を作り直す</button>
     </section>
     <section class="sheet">
@@ -3890,9 +3943,9 @@ function Parent(forced){
   $('.screen').dataset.full='1';
   $('#back').onclick=()=>{if(READY[T()])Home();else toast('受検級を選んでください')};
   $('#lv').onchange=e=>{st.level=+e.target.value;S.plan=null;zLevel=null;save();toast(`${st.level}級に切り替えました`);Parent()};
-  $('#exam').onchange=e=>{st.examDate=e.target.value;save()};
-  $('#min').onchange=e=>{st.minutes=+e.target.value;save()};
-  $('#fin').onchange=e=>{st.finishDays=+e.target.value;save()};
+  $('#exam').onchange=e=>{st.examDate=e.target.value;save();Parent()};
+  $('#min').onchange=e=>{st.minutes=+e.target.value;save();Parent()};
+  $('#fin').onchange=e=>{st.finishDays=+e.target.value;save();Parent()};
   $('#ord').onchange=e=>{st.order=e.target.value;save()};
   $('#low').onchange=e=>{st.includeLower=e.target.checked;save()};
   $('#autojudge').onchange=e=>{st.autoJudge=e.target.checked;save();toast(st.autoJudge?'自動判定をオンにしました':'自動判定をオフにしました（自分で判定します）')};
