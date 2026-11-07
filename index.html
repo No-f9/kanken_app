@@ -4086,12 +4086,17 @@ return{judge,parsePath,resample,normalize};
 const Zoo=(()=>{
 const DIR='zoo/';
 const LV={mori:10,savanna:9,mizube:8,fureai:7,yama:6,umi:5,tori:4,yoru:3};
-const ART=['mori','savanna','mizube'];
+const ART=['mori','savanna','mizube','fureai','yama','umi'];
 const AREA_NAME={mori:'もり',savanna:'さばんな',mizube:'みずべ',fureai:'ふれあいひろば',yama:'やまと こおり',umi:'うみ',tori:'とりのもり',yoru:'よるの どうぶつかん'};
-const SPECIAL={mori:'namakemono',savanna:'meerkat',mizube:'kamonohashi'};
-const LIST={mori:['usagi','risu','shika','kitsune','gorilla'],savanna:['shimauma','dachou','kirin','raion','zou'],mizube:['kamo','flamingo','kawauso','kaba','wani']};
-const PRICE={usagi:30,risu:30,shika:60,kitsune:60,gorilla:120,shimauma:60,dachou:60,kirin:120,raion:200,zou:200,kamo:30,flamingo:60,kawauso:120,kaba:200,wani:200};
-const TITLE={usagi:'うさぎ',risu:'りす',shika:'しか',kitsune:'きつね',gorilla:'ゴリラ',namakemono:'ナマケモノ',shimauma:'しまうま',dachou:'だちょう',kirin:'きりん',raion:'らいおん',zou:'ぞう',meerkat:'ミーアキャット',kamo:'かも',flamingo:'フラミンゴ',kawauso:'かわうそ',kaba:'かば',wani:'わに',kamonohashi:'カモノハシ'};
+const SPECIAL={mori:'namakemono',savanna:'meerkat',mizube:'kamonohashi',fureai:'kapibara',yama:'yukihyou',umi:'shachi'};
+const LIST={mori:['usagi','risu','shika','kitsune','gorilla'],savanna:['shimauma','dachou','kirin','raion','zou'],mizube:['kamo','flamingo','kawauso','kaba','wani'],
+  fureai:['hitsuji','yagi','morumotto','pony','zougame'],yama:['saru','iwayagi','lesser','tonakai','shirokuma'],umi:['penguin','ashika','rakko','iruka','jugon']};
+const PRICE={usagi:30,risu:30,shika:60,kitsune:60,gorilla:120,shimauma:60,dachou:60,kirin:120,raion:200,zou:200,kamo:30,flamingo:60,kawauso:120,kaba:200,wani:200,
+  hitsuji:30,yagi:30,morumotto:60,pony:60,zougame:120,saru:60,iwayagi:60,lesser:120,tonakai:120,shirokuma:200,penguin:60,ashika:120,rakko:120,iruka:200,jugon:200};
+const NOPOOP=new Set(['iruka','jugon','shachi']);   // 水の中だけで くらす動物は うんちを しない（そうじ なし）
+const TITLE={usagi:'うさぎ',risu:'りす',shika:'しか',kitsune:'きつね',gorilla:'ゴリラ',namakemono:'ナマケモノ',shimauma:'しまうま',dachou:'だちょう',kirin:'きりん',raion:'らいおん',zou:'ぞう',meerkat:'ミーアキャット',kamo:'かも',flamingo:'フラミンゴ',kawauso:'かわうそ',kaba:'かば',wani:'わに',kamonohashi:'カモノハシ',
+  hitsuji:'ひつじ',yagi:'やぎ',morumotto:'モルモット',pony:'ポニー',zougame:'ゾウガメ',kapibara:'カピバラ',saru:'ニホンザル',iwayagi:'しろいわやぎ',lesser:'レッサーパンダ',tonakai:'トナカイ',shirokuma:'しろくま',yukihyou:'ゆきひょう',
+  penguin:'ペンギン',ashika:'アシカ',rakko:'ラッコ',iruka:'イルカ',jugon:'ジュゴン',shachi:'シャチ'};
 const DESC={
   usagi:'{耳|みみ}が {長|なが}くて、{後|うし}ろ{足|あし}で ぴょんと はねるよ。',
   risu:'{木登|きのぼ}りが とくい。どんぐりを {両手|りょうて}で もって {食|た}べるよ。',
@@ -4110,7 +4115,25 @@ const DESC={
   kawauso:'{泳|およ}ぐのが とくい。{石|いし}を ころころ ころがして あそぶよ。',
   kaba:'{一日|いちにち}の ほとんどを {水|みず}の {中|なか}で すごすよ。{口|くち}は とても {大|おお}きく ひらくんだ。',
   wani:'じっと {動|うご}かずに {日|ひ}なたぼっこ。{目|め}と {鼻|はな}だけ {出|だ}して {泳|およ}ぐよ。',
-  kamonohashi:'くちばしが あるのに たまごを うむ、ふしぎな {動物|どうぶつ}。{水|みず}の {中|なか}で えさを さがすよ。'
+  kamonohashi:'くちばしが あるのに たまごを うむ、ふしぎな {動物|どうぶつ}。{水|みず}の {中|なか}で えさを さがすよ。',
+  hitsuji:'ふわふわの {毛|け}は {一年|いちねん}に {一回|いっかい} かりとって、{毛糸|けいと}に するよ。',
+  yagi:'{高|たか}い ところに のぼるのが {大好|だいす}き。あごの {下|した}に ひげが あるよ。',
+  morumotto:'うれしい ときは ぴょんと とびはねるよ。「ポップコーン」って よばれているんだ。',
+  pony:'{小|ちい}さな {馬|うま}の なかま。{小|ちい}さくても {力持|ちからも}ちだよ。',
+  zougame:'{百年|ひゃくねん}いじょう {生|い}きる ことも あるよ。{夜|よる}は {頭|あたま}と {足|あし}を こうらに しまって ねるんだ。',
+  kapibara:'{世界|せかい}で いちばん {大|おお}きい ネズミの なかま。{水|みず}に つかって のんびり するのが すき。',
+  saru:'{世界|せかい}で いちばん {北|きた}に すむ サル。{寒|さむ}い {日|ひ}に おんせんに はいる なかまも いるよ。',
+  iwayagi:'けわしい {岩山|いわやま}に すむよ。すべりにくい ひづめで {岩|いわ}を ぴょんぴょん のぼるんだ。',
+  lesser:'{竹|たけ}の {葉|は}が {大好|だいす}き。{立|た}ち{上|あ}がって {両手|りょうて}を あげる ことも あるよ。',
+  tonakai:'オスにも メスにも {角|つの}が はえる シカの なかま。{雪|ゆき}の {下|した}の こけを ほって {食|た}べるよ。',
+  shirokuma:'{白|しろ}く {見|み}える {毛|け}の {下|した}の ひふは {黒|くろ}いよ。{泳|およ}ぐのが とても とくい。',
+  yukihyou:'ふとくて {長|なが}い しっぽで バランスを とるよ。{寒|さむ}い ときは しっぽを マフラーみたいに まくんだ。',
+  penguin:'{空|そら}は とべないけれど、{水|みず}の {中|なか}を とぶように {泳|およ}ぐよ。',
+  ashika:'まえあしで からだを ささえて、{陸|りく}の {上|うえ}も {歩|ある}けるよ。{小|ちい}さな {耳|みみ}たぶが あるんだ。',
+  rakko:'おなかの {上|うえ}で {貝|かい}を わって {食|た}べるよ。ねる ときは かいそうを {体|からだ}に まいて ながされないように するんだ。',
+  iruka:'くじらの なかま。{頭|あたま}の {上|うえ}の あなで {息|いき}を するよ。ジャンプが とくい！',
+  jugon:'{海|うみ}の {草|くさ}を {食|た}べる、おとなしい {動物|どうぶつ}。{人魚|にんぎょ}の モデルとも いわれるよ。',
+  shachi:'イルカの なかまで いちばん {大|おお}きいよ。なかまと チームで くらすんだ。'
 };
 const IDEAS={m:['ソラ','リク','タロウ','ハル','レオ','ゴロー'],f:['モモ','ハナ','ミミ','ココ','ナナ','ルル'],b:['チビ','ポポ','マメ','コロ','ピコ','ミニ'],s:['キララ','ノンノ','ポン','ルナ','ピース','ニコ']};
 const PHASE_NAME={asa:'あさ',hiru:'ひる',yuu:'ゆうがた',yoru:'よる'};
@@ -4128,7 +4151,7 @@ function Zs(){
     // その日のうんち：動物のいる区画から、エリアごとに3つまで
     const poop={};let seed=[...d].reduce((s,c)=>(s*31+c.charCodeAt(0))%9973,7);
     for(const a of ART){
-      const ks=[...new Set(z.animals.filter(x=>x.area===a).map(x=>x.key))];
+      const ks=[...new Set(z.animals.filter(x=>x.area===a&&!NOPOOP.has(x.key)).map(x=>x.key))];
       ks.sort((p,q)=>((p.charCodeAt(0)+p.length*7)*seed)%101-((q.charCodeAt(0)+q.length*7)*seed)%101).slice(0,3).forEach(k=>poop[`${a}-${k}`]=true);
     }
     z.day={date:d,poop};
@@ -4173,7 +4196,7 @@ function gainHtml(g){
 /* ---------- ミッション：スペシャル動物は、エリアの ミッションを ぜんぶ やりとげると やってくる（何が来るかは 来るまで ひみつ） ----------
    もり（10級）：おなじ どうぶつの オスと メスを そろえて、あかちゃんが 1ぴき うまれる
    さばんな（9級）：★を 80字 ／ かきとり 10問 つづけて ばっちり ／ もぎテスト 140点いじょう
-   みずべ（8級）：★★を 50字 ／ かきとり ばっちり 200回 ／ もぎテスト 満点
+   みずべ（8級）・ふれあいひろば（7級）・やまと こおり（6級）・うみ（5級）：★★を 50字 ／ かきとり ばっちり 200回 ／ もぎテスト 満点
    「ばっちり」＝ 書き順も形も 合って（自動判定 OK）、「できた」を えらんだ 書き取り。その級を 練習している あいだに 数える */
 function missions(area){
   const z=Zs(),L=LV[area],ks=LEVELS[L]||[],A=z.animals.filter(x=>x.area===area);
@@ -4339,16 +4362,30 @@ function bar(){
 function ctrl(html){$('#zctrl').innerHTML=html}
 
 /* 全体図 */
-let OVI=null,MI=null;
+let OVI=null,MI=null,OVG=null,OVL=null,LOCKC=null,LOCKK='';
 async function showOverview(){
   [OVI,MI]=await Promise.all([img(META.overview.img),img(META.minis.img)]);
+  try{[OVG,OVL]=await Promise.all([img('views/overview_grey.png'),img('views/overview_lab.png')])}catch(e){OVG=OVL=null}
   view='overview';curArea=null;setSize(META.overview.W,META.overview.H);
   ctrl(`<span class="hint">エリアを タップしてね</span><span class="spacer"></span><button class="btn ghost small" id="zbook">どうぶつずかん</button>`);
   $('#zbook').onclick=book;
 }
+// まだ ひらいていない エリア（絵は できている）を 灰色に する絵を つくる
+function lockLayer(op){
+  if(!OVG||!OVL)return null;      // 絵が まだ 読みこめていない
+  const key=ART.filter(a=>!op.has(a)).join(',');if(key===LOCKK)return LOCKC;LOCKK=key;LOCKC=null;
+  if(!key)return null;
+  const W=OVL.width,H=OVL.height,c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');
+  g.drawImage(OVL,0,0);const lab=g.getImageData(0,0,W,H).data;
+  const ids=new Set(ART.filter(a=>!op.has(a)).map(a=>META.overview.keys.indexOf(a)+1));
+  g.clearRect(0,0,W,H);g.drawImage(OVG,0,0);const im=g.getImageData(0,0,W,H),d=im.data;
+  for(let i=0;i<W*H;i++)if(!ids.has(lab[i*4]))d[i*4+3]=0;
+  g.putImageData(im,0,0);LOCKC=c;return c;
+}
 function drawOverview(T){
   const O=META.overview,z=Zs(),op=openAreas();
   ctx.drawImage(OVI,0,0,VW*K,VH*K);
+  const lk=lockLayer(op);if(lk)ctx.drawImage(lk,0,0,VW*K,VH*K);
   for(const s of O.spots){if(!z.animals.some(x=>x.area===s.area&&x.key===s.key))continue;shadow(s.x,s.y,s.shadow);miniSpr(MI,s.mini,s.x,s.y,s.flip)}
   const fx=280,fy=300;for(let i=0;i<4;i++){const p=(T*1.5+i/4)%1;pxRect(fx-2+i*1.3,fy-9-p*5,1,1,'#E8F6FF')}
   tint(T);
@@ -4400,17 +4437,25 @@ function tapArea(p){
 /* ---------- 区画（動物が動く） ---------- */
 let P=null,G=null,cells=[],wcells=[],A=[],fxs=[],broom=false,feedFull=false,feedUntil=0,poop=null;
 const cellAt=(x,y)=>{const i=Math.floor(x/4),j=Math.floor(y/4);return(i>=0&&j>=0&&i<P.gw&&j<P.gh)?P.walk[j*P.gw+i]:'0'};
-const swimmer=()=>P.water||P.loco==='wade';
-const canGo=c=>c==='1'||(c==='2'&&swimmer());
+const swimmer=()=>P.water||P.aquatic||P.loco==='wade';
+const isWet=c=>c==='2'||c==='3';     // 3 = 池のふち（水の上だが 泳ぐ所ではない）
+const canGo=c=>c==='1'||(isWet(c)&&swimmer());
 const walkable=(x,y)=>canGo(cellAt(x,y));
-const inWater=f=>!f.cl&&P&&cellAt(f.x,f.y)==='2';
+const inWater=f=>!f.cl&&!f.perch&&P&&isWet(cellAt(f.x,f.y));
+const wetDo=st=>(P.wet||[]).includes(st);    // 水の上で する動き（ラッコの 食べる・ねる）
 const lineY=(li,x)=>{const L=P.lines[li];if(x<=L[0][0])return L[0][1];for(let i=1;i<L.length;i++)if(x<=L[i][0]){const a=L[i-1],b=L[i],t=(x-a[0])/(b[0]-a[0]);return a[1]+(b[1]-a[1])*t}return L[L.length-1][1]};
 const lineX=li=>[P.lines[li][0][0]+34,P.lines[li][P.lines[li].length-1][0]-34];
 const R=n=>P.rects[n];
-const ACT=()=>P.act;
-const canAct=f=>ACT()&&R(`${f.pre}_act_0`)&&!inWater(f)&&!f.cl&&!f.cling;
+// 水の中の とくべつな動き（swimact）が あれば、水の中では そちらを 使う
+const ACT=f=>(f&&inWater(f)&&!P.aquatic&&P.swimact)?P.swimact:P.act;
+const canAct=f=>{
+  if(!ACT(f)||f.cl||f.cling||f.perch)return false;
+  if(inWater(f))return P.aquatic?!!R(`${f.pre}_act_0`):!!R(`${f.pre}_swimact_0`);
+  return!P.aquatic&&cellAt(f.x,f.y)==='1'&&!!R(`${f.pre}_act_0`);   // 陸の上だけ（水ぎわで 立ち上がらない）
+};
+const actMine=f=>{const a=ACT(f);return a&&(a.pre===f.pre||a.pre==='a'&&f.k==='a')};
 const momOf=()=>A.find(f=>f.sex==='f')||A.find(f=>f.k==='a');
-function preOf(sex){const sc=P.sc;if(sex==='b')return'b';if(sex==='s')return sc.a?'a':sc.f?'f':'m';return sc[sex]?sex:'a'}
+function preOf(sex){const sc=P.sc;if(sex==='b')return'b';if(sex==='s')return P.act&&sc[P.act.pre]&&P.act.pre!=='b'?P.act.pre:sc.a?'a':sc.f?'f':'m';return sc[sex]?sex:'a'}
 
 function pickTarget(f,maxd){
   if(P.loco==='branch'){const[a,b]=lineX(f.line);const x=rnd(a,b);return{x,y:lineY(f.line,x)}}
@@ -4424,11 +4469,41 @@ function pickTarget(f,maxd){
   return null;
 }
 function goTo(f,x,y,then){f.st='walk';f.tx=x;f.ty=y;f.then=then;f.t=0;f.hopT=0}
-function idle(f,d){f.st='idle';f.t=0;f.dur=d??rnd(1.2,3.4)*(P.loco==='branch'?2.5:1)*(P.idleMul||1)}
+function idle(f,d){f.st='idle';f.t=0;f.dur=d??rnd(1.2,3.4)*(P.loco==='branch'?2.5:1)*(P.idleMul||1)*(P.bath&&inWater(f)?rnd(3,5):1)}
 function toSleep(f){const i=A.indexOf(f);const s=P.sleep[i]||P.sleep[0];if(P.loco==='branch'||!s){f.st='sleep';return}goTo(f,s[0],s[1],g=>{g.st='sleep';g.t=rnd(0,2)})}
 
 /* 木のぼり（りす） */
-const groundOf=f=>f.cl?{x:P.climb[f.cl.i].exit[0],y:P.climb[f.cl.i].exit[1]}:(f.hole&&f.st==='hole')?P.holes[f.hole.b]:f;
+const groundOf=f=>f.cl?{x:P.climb[f.cl.i].exit[0],y:P.climb[f.cl.i].exit[1]}:f.perch?{x:P.perches[f.perch.i].base[0],y:P.perches[f.perch.i].base[1]}:(f.hole&&f.st==='hole')?P.holes[f.hole.b]:f;
+/* 岩のぼり（しろいわやぎ）：岩の前まで 歩いて、だんを ぴょんぴょん のぼり、しばらく 上で すごして おりる */
+const HOP=.5;
+function startPerch(f){
+  const PP=P.perches;if(!PP||!PP.length)return false;
+  const free=PP.map((c,i)=>i).filter(i=>!A.some(g=>g.perchI===i));if(!free.length)return false;
+  const dd=i=>Math.hypot(PP[i].base[0]-f.x,PP[i].base[1]-f.y);free.sort((a,b)=>dd(a)-dd(b));
+  const i=Math.random()<.6?free[0]:free[Math.floor(Math.random()*free.length)],c=PP[i];f.perchI=i;
+  goTo(f,c.base[0],c.base[1],g=>{g.st='perch';g.perch={i,ph:'up',k:0,t:0,from:[g.x,g.y]}});
+  return true;
+}
+function perchStep(f,dt){
+  const c=P.perches[f.perch.i],pr=f.perch;pr.t+=dt;
+  if(pr.ph==='up'||pr.ph==='down'){
+    const to=pr.ph==='up'?c.pts[pr.k]:(pr.k>0?c.pts[pr.k-1]:c.base);
+    const u=Math.min(1,pr.t/HOP),lift=8+Math.abs(to[1]-pr.from[1])*.35;
+    f.x=pr.from[0]+(to[0]-pr.from[0])*u;f.y=pr.from[1]+(to[1]-pr.from[1])*u;f.hopLift=Math.sin(Math.PI*u)*lift;
+    if(Math.abs(to[0]-pr.from[0])>2)f.dir=to[0]>pr.from[0]?1:-1;
+    if(u<1)return;
+    f.hopLift=0;pr.t=0;pr.from=[to[0],to[1]];
+    if(pr.ph==='up'){
+      if(f.pending||isNight()){pr.ph='down';return}
+      if(pr.k<c.pts.length-1)pr.k++;else{pr.ph='stay';pr.dur=rnd(4,9);pr.graze=Math.random()<.35;f.dir=Math.random()<.5?-1:1}
+    }else if(pr.k>0)pr.k--;
+    else{f.perch=null;f.perchI=null;f.st='idle';f.t=0;const p=f.pending;f.pending=null;if(p)goTo(f,p.x,p.y,p.then);else idle(f,rnd(.6,1.4))}
+  }else if(pr.ph==='stay'&&(pr.t>pr.dur||f.pending||isNight())){pr.ph='down';pr.k=c.pts.length-1;pr.t=0;pr.from=[f.x,f.y]}
+}
+function splash(x,y,big){
+  for(let i=0;i<(big?16:10);i++)fxs.push({type:'sdrop',x:x+rnd(-10,10),y,vx:rnd(-34,34),vy:rnd(-90,-40)*(big?1.2:1),t:0,life:.9});
+  fxs.push({type:'ring',x,y,t:0,life:.9,w:big?30:20});
+}
 function startClimb(f){
   const free=P.climb.map((c,i)=>i).filter(i=>!A.some(g=>g.tree===i));if(!free.length)return false;
   const dd=i=>Math.hypot(P.climb[i].exit[0]-f.x,P.climb[i].exit[1]-f.y);free.sort((a,b)=>dd(a)-dd(b));
@@ -4475,8 +4550,9 @@ async function showPen(area,key,opt){
   const Pn=META.pens[`${area}-${key}`];
   const[bg,at]=await Promise.all([img(Pn.bg),img(Pn.atlas)]);
   P=Pn;G={bg,at};view='pen';curArea=area;curKey=key;setSize(P.W,P.H);
-  broom=false;fxs=[];cells=[];wcells=[];
+  broom=false;fxs=[];cells=[];wcells=[];bathToast=0;
   for(let j=0;j<P.gh;j++)for(let i=0;i<P.gw;i++){const c=P.walk[j*P.gw+i];if(c==='1')cells.push([i*4+2,j*4+2]);else if(c==='2')wcells.push([i*4+2,j*4+2])}
+  if(P.aquatic)cells=wcells.slice();     // 水の中だけで くらす
   const roster=penOf(area,key).slice().sort((a,b)=>'mfsb'.indexOf(a.sex)-'mfsb'.indexOf(b.sex));
   A=roster.map((r,i)=>{const pre=preOf(r.sex);return{id:r.id,name:r.name,sex:r.sex,pre,k:pre==='b'?'b':'a',x:0,y:0,dir:i%2?1:-1,st:'idle',t:0,dur:rnd(.5,2),dist:0,pet:0,line:i%2,tree:null,cl:null,hole:null,pending:null,wet:false,hb:rnd(0,6)}});
   const mom=momOf(),baby=A.find(f=>f.k==='b');
@@ -4490,7 +4566,7 @@ async function showPen(area,key,opt){
   for(const f of A)f.wet=inWater(f);
   if(isNight())A.forEach((f,i)=>{if(f.cling)return;f.cl=null;f.tree=null;f.hole=null;const s=P.sleep[i]||P.sleep[0];if(s&&P.loco!=='branch'){f.x=s[0];f.y=s[1]}f.st='sleep';f.t=rnd(0,2);f.wet=false});
   feedFull=false;feedUntil=0;
-  poop=Zs().day.poop[`${area}-${key}`]?{x:P.poop.x,y:P.poop.y}:null;
+  poop=P.poop&&Zs().day.poop[`${area}-${key}`]?{x:P.poop.x,y:P.poop.y}:null;
   penCtrl();
   const sp=key===SPECIAL[area];
   if(!A.length){
@@ -4498,22 +4574,37 @@ async function showPen(area,key,opt){
           :`まだ だれも いないよ。<br>チケット ${PRICE[key]}まいで ${TITLE[key]}を むかえられるよ`);
   }else if(!opt.arrive){
     const a=P.act;
-    toast(isNight()?'みんな ねているよ。しずかにね':P.loco==='branch'?'ナマケモノは とっても ゆっくり うごくよ'
+    toast(isNight()?'みんな ねているよ。しずかにね':INTRO[key]&&(key!==SPECIAL[area]||specialHere(area))?INTRO[key]:P.loco==='branch'?'ナマケモノは とっても ゆっくり うごくよ'
       :P.climb&&P.climb.length?'りすは {木|き}のぼりが とくい！':P.holes&&P.holes.length>1?'ミーアキャットは あなに もぐって、べつの あなから でてくるよ'
-      :a&&A.some(f=>f.pre===a.pre||a.pre==='a'&&f.k==='a')?`${A.find(f=>f.pre===a.pre||a.pre==='a'&&f.k==='a').name}を タップしてみよう`:P.water?`${TITLE[key]}は {泳|およ}ぐのが とくい！`:`${TITLE[key]}を タップしてみよう`);
+      :a&&A.some(f=>f.pre===a.pre||a.pre==='a'&&f.k==='a')?`${A.find(f=>f.pre===a.pre||a.pre==='a'&&f.k==='a').name}を タップしてみよう`:P.water||P.aquatic?`${TITLE[key]}は {泳|およ}ぐのが とくい！`:`${TITLE[key]}を タップしてみよう`);
   }
 }
+// 区画に 入ったときの ひとこと（とくべつな くらし方を する動物）
+const INTRO={
+  saru:'ニホンザルは ときどき おんせんに はいるよ',
+  zougame:'ゾウガメは とっても ゆっくり。ねる ときは こうらに かくれるよ',
+  kapibara:'カピバラは {水|みず}あびが だいすき',
+  iwayagi:'しろいわやぎは {岩|いわ}のぼりが とくい！ 見ていてね',
+  shirokuma:'しろくまは つめたい プールで {泳|およ}ぐよ',
+  rakko:'ラッコは おなかの {上|うえ}で ごはんを {食|た}べるよ',
+  iruka:'イルカを タップすると ジャンプするよ',
+  jugon:'ジュゴンは {水|みず}の {中|なか}で のんびり くらしているよ',
+  shachi:'シャチを タップすると {大|だい}ジャンプ！'
+};
+let bathToast=0;
 function msg(html){const m=$('#zmsg');m.innerHTML=`<div>${html}</div>`;m.hidden=false}
 function penCtrl(){
   const z=Zs(),hungry=A.filter(f=>!fedToday(Zs().animals.find(x=>x.id===f.id)||{}));
   const sp=curKey===SPECIAL[curArea],have=penOf(curArea,curKey),full=sp||(have.some(x=>x.sex==='m')&&have.some(x=>x.sex==='f'));
   ctrl(`<button class="btn ghost small" id="zup">◀ ${AREA_NAME[curArea]}</button>
     ${A.length?`<button class="btn small" id="zfeed" ${hungry.length?'':'disabled'}>${hungry.length?`えさを あげる（${hungry.length}こ）`:'きょうは もう {食|た}べたよ'}</button>
-    <button class="btn ghost small" id="zbroom" aria-pressed="false" ${poop?'':'disabled'}>${poop?'ほうきで そうじ':'きれいだよ'}</button>`:''}
+    ${P.poop?`<button class="btn ghost small" id="zbroom" aria-pressed="false" ${poop?'':'disabled'}>${poop?'ほうきで そうじ':'きれいだよ'}</button>`:''}
+    <button class="btn ghost small" id="znames" aria-pressed="${!S.settings.zooNoNames}">なまえ</button>`:''}
     <span class="spacer"></span>${full?'':`<button class="btn ghost small" id="zadopt">おむかえ</button>`}`);
   $('#zup').onclick=()=>open('area',curArea);
   $('#zfeed')&&($('#zfeed').onclick=feed);
   $('#zbroom')&&($('#zbroom').onclick=()=>setBroom(!broom));
+  $('#znames')&&($('#znames').onclick=()=>{S.settings.zooNoNames=!S.settings.zooNoNames;save();$('#znames').setAttribute('aria-pressed',!S.settings.zooNoNames)});
   $('#zadopt')&&($('#zadopt').onclick=()=>adopt(curArea,curKey));
 }
 function setBroom(v){broom=v;const b=$('#zbroom');if(b)b.setAttribute('aria-pressed',v);cv.classList.toggle('broom',v);if(v)toast('うんちを タップしてね')}
@@ -4538,8 +4629,8 @@ function feed(){
     order.forEach((f,i)=>{
       if(f.cling)return;const s=slots[i%slots.length];f.pet=0;
       const then=g=>{g.dir=s.dir;g.st='eat';g.t=0;g.dur=rnd(4.5,6)*(P.loco==='branch'?1.6:1);g.after=isNight()?'sleep':null;heart(g)};
-      if(f.st==='climb'||f.st==='hole'){f.pending={x:s.x,y:s.y,then};return}
-      f.tree=null;f.hole=null;goTo(f,s.x,s.y,then);
+      if(f.st==='climb'||f.st==='hole'||f.st==='perch'){f.pending={x:s.x,y:s.y,then};return}
+      f.tree=null;f.hole=null;f.perchI=null;goTo(f,s.x,s.y,then);
     });
     toast(eat.length<hungry.length?`えさが たりなくて ${eat.length}とうだけ {食|た}べたよ`:isNight()?'おきて ごはんを {食|た}べているよ':'ごはんだよ！ みんなが あつまってきた');
     setTimeout(()=>events(curArea,curKey),3500);
@@ -4577,8 +4668,8 @@ function tapPen(p){
   }
   if(!best)return;
   const night=isNight()&&best.st==='sleep';
-  if(!night&&canAct(best)&&best.st!=='eat'&&best.st!=='climb'&&(ACT().pre===best.pre||ACT().pre==='a'&&best.k==='a')){
-    best.st='act';best.t=0;best.dur=(ACT().dur||2)+.4;best.pet=0;heart(best);toast(ACT().toast.replace('{name}',best.name));
+  if(!night&&canAct(best)&&best.st!=='eat'&&best.st!=='climb'&&actMine(best)){
+    const a=ACT(best);best.st='act';best.t=0;best.dur=(a.dur||2)+(a.once?.15:.4);best.pet=0;heart(best);toast(a.toast.replace('{name}',best.name));
   }else{best.pet=1.4;heart(best);toast(night?`${best.name}は ぐっすり ねているよ`:`${best.name}（${SEX_WORD[best.sex]}）を なでたよ`)}
 }
 
@@ -4591,19 +4682,30 @@ function update(dt,T){
     if(f.st==='sleep'){if(!night)idle(f,rnd(.5,2));continue}
     if(f.st==='climb'){climbStep(f,dt);continue}
     if(f.st==='hole'){holeStep(f,dt);continue}
+    if(f.st==='perch'){perchStep(f,dt);continue}
     if((f.st==='idle'||f.st==='graze')&&f.t>f.dur){
       if(night){toSleep(f);continue}
       const gm=mom?groundOf(mom):f;
-      if(f.k==='b'&&mom&&Math.hypot(gm.x-f.x,gm.y-f.y)>56&&mom.st!=='eat')goTo(f,gm.x-(mom.cl?0:mom.dir*30)+rnd(-6,6),gm.y+rnd(6,14),null);
+      if(f.k==='b'&&mom&&Math.hypot(gm.x-f.x,gm.y-f.y)>56&&mom.st!=='eat')goTo(f,gm.x-(mom.cl||mom.perch?0:mom.dir*30)+rnd(-6,6),gm.y+rnd(6,14),null);
       else if(f.k==='b'&&P.key==='kitsune'&&Math.random()<.4){f.st='hop';f.t=0}
-      else if(canAct(f)&&(ACT().pre===f.pre||ACT().pre==='a'&&f.k==='a')&&Math.random()<(ACT().auto??.2)){f.st='act';f.t=0;f.dur=ACT().dur||2}
+      else if(canAct(f)&&actMine(f)&&Math.random()<(ACT(f).auto??.2)){f.st='act';f.t=0;f.dur=ACT(f).dur||2}
       else if(P.climb&&P.climb.length&&Math.random()<.45&&startClimb(f)){}
       else if(P.holes&&P.holes.length>1&&Math.random()<.45&&startHole(f)){}
+      else if(P.perches&&P.perches.length&&Math.random()<.4&&startPerch(f)){}
       else if(P.loco!=='branch'&&!inWater(f)&&Math.random()<(P.graze??.3)){f.st='graze';f.t=0;f.dur=rnd(2,4)}
       else{const tg=pickTarget(f,f.k==='b'?90:190);if(tg)goTo(f,tg.x,tg.y,null);else idle(f)}
     }
     if(f.st==='hop'&&f.t>.5)idle(f,rnd(.2,.8));
-    if(f.st==='act'&&f.t>f.dur)idle(f,rnd(.8,1.6));
+    if(f.st==='act'&&P.aquatic&&inWater(f)){   // ジャンプの とびだし と ちゃくすい（コマは ひだり向きで 右から左へ とぶ）
+      const J=ACT(f).jump,r=R(`${f.pre}_act_0`),w=r?r[2]:0,s=-f.dir;
+      if(!f.sp0&&f.t>.05){f.sp0=true;splash(J?f.x+s*J[0]*w:f.x,f.y,P.key==='shachi')}
+      if(!f.sp1&&f.t>(J?3/(ACT(f).fps||4):f.dur*.82)){f.sp1=true;splash(J?f.x-s*J[1]*w:f.x,f.y,P.key==='shachi')}
+    }
+    if(f.st==='act'&&f.t>f.dur){
+      const J=ACT(f).jump;
+      if(J&&P.aquatic){const r=R(`${f.pre}_act_0`),nx=f.x+f.dir*J[1]*(r?r[2]:0);if(walkable(nx,f.y))f.x=nx}   // もぐった所から つづける
+      f.sp0=f.sp1=false;idle(f,rnd(.8,1.6));
+    }
     if(f.st==='walk'){
       const dx=f.tx-f.x,dy=f.ty-f.y,d=Math.hypot(dx,dy);
       const sp=P.speed*(f.k==='b'?.85:1)*(inWater(f)&&P.water?.8:1);
@@ -4615,7 +4717,8 @@ function update(dt,T){
     }
     if(f.st==='eat'&&f.t>f.dur){if(f.after==='sleep'){f.after=null;toSleep(f)}else{f.st='idle';f.t=0;f.dur=.6}}
     const w=inWater(f);
-    if(w!==f.wet){f.wet=w;if(swimmer())for(let i=0;i<7;i++)fxs.push({type:'drop',x:f.x+rnd(-8,8),y:f.y,vx:rnd(-20,20),vy:rnd(-46,-24),t:0,life:.6})}
+    if(w!==f.wet){f.wet=w;if(swimmer())for(let i=0;i<7;i++)fxs.push({type:'drop',x:f.x+rnd(-8,8),y:f.y,vx:rnd(-20,20),vy:rnd(-46,-24),t:0,life:.6});
+      if(w&&P.bath&&!night&&T>bathToast){bathToast=T+25;toast(`${f.name}が おんせんに はいったよ。あったかい〜`)}}
   }
   if(feedFull&&T>feedUntil&&!A.some(f=>f.st==='eat'))feedFull=false;
   for(const e of fxs)e.t+=dt;
@@ -4632,12 +4735,18 @@ function frameOf(f,T){
     if(ph==='perch'){if(f.pet>0)return`${p}_idle_${Math.floor(T*14)%8}`;if(f.cl.nib)return`${p}_eat_${Math.floor(T*8)%8}`;return((T+f.x*.013)%3.4<.14)?`${p}_blink`:`${p}_idle_${Math.floor(T*7)%8}`}
     return`${p}_walk_${Math.floor(f.dist/P.stride)%4}`;
   }
+  if(f.st==='perch'){
+    const pr=f.perch;if(pr.ph!=='stay')return`${p}_walk_${pr.t/HOP<.5?1:5}`;
+    if(f.pet>0)return`${p}_idle_${Math.floor(T*14)%8}`;
+    if(pr.graze&&R(`${p}_graze_0`))return`${p}_graze_${Math.floor(T*6)%8}`;
+    return((T+f.x*.013)%3.4<.14)?`${p}_blink`:`${p}_idle_${Math.floor(T*7)%8}`;
+  }
   if(f.st==='hole')return f.hole.ph==='in'?`${p}_walk_${Math.floor(T*10)%(P.nwalk||4)}`:`${p}_idle_${Math.floor(T*4)%8}`;
-  if(inWater(f)&&R(`${p}_swim_0`)){
+  if(f.st==='act'){const a=ACT(f),sw=inWater(f)&&!P.aquatic&&R(`${p}_swimact_0`);return`${p}_${sw?'swimact':'act'}_${Math.min(3,Math.floor(f.t*(a.fps||8))%(a.once?99:4))}`}
+  if(inWater(f)&&R(`${p}_swim_0`)&&!((P.aquatic||wetDo('eat'))&&f.st==='eat')){
     if(f.st==='walk')return`${p}_swim_${Math.floor(f.dist/Math.max(3,P.stride*1.4))%4}`;
     return`${p}_swim_${Math.floor(T*2.4+f.x*.01)%4}`;
   }
-  if(f.st==='act')return`${p}_act_${Math.floor(f.t*(ACT().fps||8))%4}`;
   if(f.st==='walk'){if(P.loco==='hop')return`${p}_walk_${Math.min(4,Math.floor(f.hopT/.09))}`;return`${p}_walk_${Math.floor(f.dist/P.stride)%(P.nwalk||8)}`}
   if(f.st==='eat')return`${p}_eat_${Math.floor(T*(P.loco==='branch'?4:8))%8}`;
   if(f.st==='graze')return R(`${p}_graze_0`)?`${p}_graze_${Math.floor(T*6)%8}`:`${p}_eat_${Math.floor(T*6)%8}`;
@@ -4662,7 +4771,7 @@ function ripple(f,T){
 }
 function tagBox(f,T){
   const hop=f.st==='hop'?Math.sin(Math.PI*Math.min(1,f.t/.5))*14:0;const r=R(frameOf(f,T));if(!r)return null;
-  let y=(f.y-r[5]-20-hop)*K,cx=f.x;
+  let y=(f.y-r[5]-20-hop-(f.hopLift||0))*K,cx=f.x;
   if(P.loco==='branch'){const sc=P.sc[f.pre];y=(f.y+46*sc/1.35)*K;cx=f.x+(f.dir>0?12:-12)*sc}
   if(f.cling){y=(f.y+6)*K;cx=f.x+(f.dir>0?-44:44)}
   const mark=SEX_MARK[f.sex];
@@ -4692,7 +4801,7 @@ function drawPen(T){
   ctx.drawImage(G.bg,0,0,VW*K,VH*K);
   if(!isNight())P.vis.forEach((v,i)=>{ctx.save();ctx.globalAlpha=.35;ctx.fillStyle='#141830';ctx.beginPath();ctx.ellipse((v.x+1)*K,(v.y+.5)*K,12*K,3*K,0,0,Math.PI*2);ctx.fill();ctx.restore();spr('o_vis'+i,v.x,v.y-(Math.floor(T*1.5+i)%4===0?1:0))});
   if(P.loco!=='branch')for(const f of A){
-    if(f.st==='climb'||f.st==='hole'||inWater(f)||f.cling)continue;
+    if(f.st==='climb'||f.st==='hole'||f.st==='perch'||inWater(f)||f.cling)continue;
     const hop=f.st==='hop'?Math.sin(Math.PI*Math.min(1,f.t/.5)):(P.loco==='hop'&&f.st==='walk'?(f.hopT>.09&&f.hopT<.36?.6:0):0);
     spr(f.k==='a'?'sh_a':'sh_b',f.x-(f.st==='sleep'?0:f.dir*2),f.y+2,false,1-hop*.4);
   }
@@ -4705,14 +4814,23 @@ function drawPen(T){
     if(f.st==='hole'){list.push({y:f.y,d:()=>{const s=holeSink(f);if(s>=1)return;const r=R(frameOf(f,T)),h=r?r[5]:30;ctx.save();ctx.beginPath();ctx.rect(0,0,VW*K,Math.round(f.y+1)*K);ctx.clip();spr(frameOf(f,T),f.x,f.y+s*(h+2),flipOf(f));ctx.restore()}});continue}
     const hop=f.st==='hop'?Math.sin(Math.PI*Math.min(1,f.t/.5))*14:0;
     const hopY=(P.loco==='hop'&&f.st==='walk')?[0,3,7,3,0][Math.min(4,Math.floor(f.hopT/.09))]:0;
-    const sy=P.loco==='branch'?f.y-500:f.tree!=null?Math.max(f.y,P.climb[f.tree].oy+.5):f.y;
+    const sy=P.loco==='branch'?f.y-500:f.tree!=null?Math.max(f.y,P.climb[f.tree].oy+.5):f.perch?Math.max(f.y,P.perches[f.perch.i].oy+1):f.y;
     list.push({y:sy,d:()=>{
-      if(inWater(f))ripple(f,T);
-      spr(frameOf(f,T),f.x,f.y-hop-hopY,flipOf(f));
+      if(inWater(f)&&f.st!=='act')ripple(f,T);
+      spr(frameOf(f,T),f.x,f.y-hop-hopY-(f.hopLift||0),flipOf(f));
       const b=A.find(c=>c.cling);if(b&&f===momOf())spr(frameOf(b,T),b.x,b.y,b.dir>0);
     }});
   }
   list.sort((a,b)=>a.y-b.y).forEach(o=>o.d());
+  if(P.onsen){   // おんせんの ゆげ
+    const O=P.onsen,n=Math.round(8+O.rx/6);ctx.save();ctx.fillStyle='#FFFFFF';
+    for(let i=0;i<n;i++){
+      const ph=(T*.22+i*.173)%1,bx=O.x+((i*.618)%1-.5)*O.rx*1.3;
+      const x=bx+Math.sin(T*.7+i*1.7+ph*4)*5,y=O.y+((i*.37)%1-.5)*O.ry*.8-ph*30,r=5+ph*9;
+      ctx.globalAlpha=Math.sin(Math.PI*ph)*.42;ctx.beginPath();ctx.ellipse(x*K,y*K,r*K,r*.62*K,0,0,Math.PI*2);ctx.fill();
+    }
+    ctx.restore();
+  }
   if(poop&&!isNight())for(let i=0;i<2;i++){const ph=(T*.9+i*.6)%1.6;for(let k=0;k<6;k++)pxRect(poop.x-4+i*8+2*Math.sin(k*.9+T*3),poop.y-16-ph*10-k,1,1,k%2?'#96A078':'#788264')}
   if(!isNight())[[.62,.35,'#FAE264','#C9A93E',0],[.4,.62,'#FBFBF4','#B9BDB2',2.1]].forEach(([fx,fy,c0,c1,s])=>{
     const tt=T+s,X=fx*VW+50*Math.sin(tt*.6),Y=fy*VH+14*Math.sin(tt*1.3)-6*Math.abs(Math.sin(tt*4));
@@ -4722,6 +4840,8 @@ function drawPen(T){
   for(const e of fxs){
     if(e.type==='pellet'&&e.t>0){const p=Math.min(1,e.t/.45);pxRect(e.x,e.y-e.h0*(1-p*p),2,2,'#B4784A')}
     if(e.type==='drop')pxRect(e.x+e.vx*e.t,e.y+e.vy*e.t+90*e.t*e.t,1,1,'#E2F4FC');
+    if(e.type==='sdrop'){const yy=e.y+e.vy*e.t+150*e.t*e.t;if(yy<=e.y+1)pxRect(e.x+e.vx*e.t,yy,2,2,'#E2F4FC')}
+    if(e.type==='ring'){const p=e.t/e.life;ctx.save();ctx.globalAlpha=.9*(1-p);ctx.strokeStyle='#E8F6FC';ctx.lineWidth=K;ctx.beginPath();ctx.ellipse(e.x*K,e.y*K,e.w*(.5+p)*K,e.w*(.5+p)*.28*K,0,0,Math.PI*2);ctx.stroke();ctx.restore()}
     if(e.type==='dust')pxRect(e.x+e.vx*e.t,e.y+e.vy*e.t+110*e.t*e.t,1,1,e.x%2<1?'#B07A50':'#8C5A38');
     if(e.type==='spark'){const p=e.t/.9,r=4+p*14;for(let k=0;k<6;k++){const a=k*Math.PI/3;pxRect(e.x+Math.cos(a)*r,e.y+Math.sin(a)*r*.7,2,2,k%2?'#FFF4A8':'#FFFFFF')}pxRect(e.x-1,e.y-3-p*6,2,6,'#FFFFFF');pxRect(e.x-3,e.y-1-p*6,6,2,'#FFFFFF')}
   }
@@ -4737,12 +4857,12 @@ function drawPen(T){
     const x=z.animals.find(a=>a.id===f.id);
     if(x&&!fedToday(x)&&f.st!=='eat'&&!hidden(f)&&f.st!=='climb'&&((T+f.hb)%7)<2.2)bubble(f,T);
   }
-  drawTags(T);
-  for(const f of A)if(f.st==='act'&&ACT()){
-    const fr=Math.floor(f.t*(ACT().fps||8))%4,r=R(frameOf(f,T));if(!r)continue;
+  if(!S.settings.zooNoNames)drawTags(T);
+  for(const f of A)if(f.st==='act'&&ACT(f)){
+    const a=ACT(f),fr=Math.floor(f.t*(a.fps||8))%4,r=R(frameOf(f,T));if(!r)continue;
     const x=(f.x+(f.dir>0?1:-1)*(r[2]*.3+26))*K,y=(f.y-r[5]*.8-(fr%2)*5)*K;
     ctx.save();ctx.font=`900 24px ${FONT}`;ctx.textAlign='center';ctx.lineJoin='round';ctx.strokeStyle='#27313A';ctx.lineWidth=6;
-    ctx.strokeText(ACT().text,x,Math.max(28,y));ctx.fillStyle='#FFF4C8';ctx.fillText(ACT().text,x,Math.max(28,y));ctx.restore();
+    ctx.strokeText(a.text,x,Math.max(28,y));ctx.fillStyle='#FFF4C8';ctx.fillText(a.text,x,Math.max(28,y));ctx.restore();
   }
   for(const e of fxs)if(e.type==='heart'){const p=e.t/1.1;drawHeart(e.x,e.y-p*20,1-Math.max(0,p-.6)/.4,p<.15?2:3)}
 }
