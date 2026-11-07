@@ -126,6 +126,7 @@ button:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--sky);outli
 .zbar i{display:block;height:100%;background:var(--gold);border-radius:999px}
 .zmlist li.ok .zbar i{background:var(--cover)}
 .zmlist small{font-size:15px;font-weight:700;color:var(--ink2)}
+.zmlist .hint{font-size:14px;color:var(--ink2);margin-top:2px}
 .zgoal#zmis{margin-left:8px}
 .zclear{display:flex;flex-direction:column;align-items:center;gap:8px;margin:16px 0 0;font-size:19px;font-weight:800;animation:zpop .6s cubic-bezier(.3,1.6,.5,1) both .6s}
 .zclear .tag{background:var(--gold);color:#fff;border-radius:999px;padding:3px 12px;margin-right:10px;font-size:15px}
@@ -3429,6 +3430,7 @@ function writingCard(c,o){
       <p class="muted" style="font-size:18px;margin:4px 0 0;text-align:center">${jr&&jr.verdict==='ok'?'とめ・はね・はらいを {比|くら}べて えらぼう':'とめ・はね・はらいも {比|くら}べてみよう'}</p>`;
     animate($('#model svg'),200);
     const fin=g=>{
+      noteWriting(jr,g);
       if(o.hw&&SESSION.mode!=='mock'&&!c.retry)saveHw(o.answer,img,g);
       if(g==='again'&&SESSION.mode!=='mock')traceFix(o.answer,()=>advance(c,g));else advance(c,g);
     };
@@ -3441,6 +3443,13 @@ function writingCard(c,o){
     $('#after').innerHTML=`${judgeMsg(o.answer,jr)}${gradeChip(jr.verdict)}<div style="text-align:right;margin-top:14px"><button class="btn" id="go">{次|つぎ}へ</button></div>`;
     $('#go').onclick=()=>fin(jr.verdict);
   };
+}
+/* 書き取りの「ばっちり」（書き順も形も合って「できた」）を、いまの級ごとに数える（スペシャル動物の ミッションに使う）。
+   自動判定を切っているときは「できた」を数える */
+function noteWriting(jr,g){
+  const a=S.ach=S.ach||{};a.w=a.w||{};const w=a.w[T()]=a.w[T()]||{ok:0,run:0,best:0};
+  if(g==='good'&&(!jr||jr.verdict==='ok')){w.ok++;w.run++;w.best=Math.max(w.best,w.run)}else w.run=0;
+  save();
 }
 /* 書いた字を判定する（おうちの方の設定で切れる）。お手本がない字は null（自分で判定） */
 function judgeWriting(k,strokes){
@@ -3915,7 +3924,7 @@ function Parent(forced){
     </section>
     <section class="sheet">
       <h3>動物園（練習のごほうび）</h3>
-      <p>エリアごとのミッション（動物5種類をむかえる・その級の漢字をぜんぶ一度は★にする・その級の模擬テストで満点2回）をやりとげると、スペシャル動物がやってきます。何が来るかは来るまでひみつです。</p>
+      <p>エリアごとのミッションをやりとげると、スペシャル動物がやってきます（何が来るかは来るまでひみつ）。もり：同じ動物のオスとメスをそろえて、赤ちゃんが1匹生まれる。さばんな：9級の漢字を80字★に・書き取りを10問続けてばっちり・9級の模擬テストで140点以上。みずべ：8級の漢字を50字★★に・書き取りのばっちり200回・8級の模擬テストで満点。「ばっちり」は、書き順も形も合って（自動判定OK）「できた」を選んだ書き取りで、その級を練習している間に数えます。</p>
       <p>練習すると「チケット」と「えさ」がたまり、チケットで動物を迎えられます。1問答えると1枚（同じ時間帯に2回目に出た問題は0枚。むげんモードは同じ日に2回目は0枚）、新しい漢字で3枚、午前・午後の練習を終えるとそれぞれ10枚、★がつくと5〜20枚。えさは最大30個まで。動物園で遊んでもチケットは増えません。</p>
       <label><input type="checkbox" id="zoohide" ${st.zooHidden?'checked':''}> 動物園をかくす（受検直前など、練習に集中させたいとき。かくしている間もチケットはたまります）</label>
       <p>いまのチケット ${Zoo.state().tickets}枚・えさ ${Zoo.state().feed}個・動物 ${Zoo.state().animals.length}頭。受検級を上げると、さばんな（9級）・みずべ（8級）が開きます。</p>
@@ -4161,19 +4170,31 @@ function gainHtml(g){
     (g.t||g.f?`<div class="zgain"><span class="tk">チケット <b>+${g.t}</b>まい</span>${g.f?`<span class="fd">えさ <b>+${g.f}</b>こ</span>`:''}</div>`:'');
 }
 
-/* ---------- ミッション：スペシャル動物は、エリアの級の ミッションを ぜんぶ やりとげると やってくる ----------
-   ① エリアの 5しゅるいを むかえる ② その級の漢字を ぜんぶ ★（一度でも）にする ③ その級（か それより上の級）の もぎテストで 満点を 2回
-   何が来るかは、来るまで ひみつ */
+/* ---------- ミッション：スペシャル動物は、エリアの ミッションを ぜんぶ やりとげると やってくる（何が来るかは 来るまで ひみつ） ----------
+   もり（10級）：おなじ どうぶつの オスと メスを そろえて、あかちゃんが 1ぴき うまれる
+   さばんな（9級）：★を 80字 ／ かきとり 10問 つづけて ばっちり ／ もぎテスト 140点いじょう
+   みずべ（8級）：★★を 50字 ／ かきとり ばっちり 200回 ／ もぎテスト 満点
+   「ばっちり」＝ 書き順も形も 合って（自動判定 OK）、「できた」を えらんだ 書き取り。その級を 練習している あいだに 数える */
 function missions(area){
-  const z=Zs(),L=LV[area],ks=LEVELS[L]||[];
-  const sp=LIST[area].filter(k=>z.animals.some(x=>x.area===area&&x.key===k)).length;
-  const st=ks.filter(k=>{const a=(S.kanji[k]||{}).starAt||{};return !!a[3]}).length;
-  const pf=S.mocks.filter(m=>{const l=m.level||10;return l<=L&&MOCKCFG[l]&&m.score>=MOCKCFG[l].max}).length;
-  return[
-    {id:'zoo',label:`${AREA_NAME[area]}の どうぶつ 5しゅるいを むかえる`,n:sp,max:LIST[area].length},
-    {id:'star',label:`${L}きゅうの かんじを ぜんぶ ★に する`,n:st,max:ks.length},
-    {id:'mock',label:`${L}きゅうの もぎテストで まんてんを 2かい とる`,n:Math.min(2,pf),max:2},
-  ].map(m=>Object.assign(m,{done:m.n>=m.max}));
+  const z=Zs(),L=LV[area],ks=LEVELS[L]||[],A=z.animals.filter(x=>x.area===area);
+  const w=((S.ach||{}).w||{})[L]||{};
+  const starN=s=>ks.filter(k=>{const a=(S.kanji[k]||{}).starAt||{};return !!a[s]}).length;
+  const mockN=th=>S.mocks.filter(m=>{const l=m.level||10;return l<=L&&MOCKCFG[l]&&m.score>=MOCKCFG[l].max*th}).length;
+  let ms;
+  if(area==='mori'){
+    const pair=LIST[area].some(k=>A.some(x=>x.key===k&&x.sex==='m')&&A.some(x=>x.key===k&&x.sex==='f'));
+    ms=[{id:'pair',label:'もりで おなじ どうぶつの オスと メスを そろえる',hint:'チケットで オスと メスを むかえよう',n:pair?1:0,max:1},
+        {id:'baby',label:'もりで あかちゃんが 1ぴき うまれる',hint:'オスと メスに 7にち つづけて えさを あげると うまれるよ',n:A.some(x=>x.sex==='b')?1:0,max:1}];
+  }else if(area==='savanna'){
+    ms=[{id:'star',label:`${L}きゅうの かんじを 80こ ★に する`,n:Math.min(80,starN(3)),max:80},
+        {id:'wrun',label:'かきとりを 10もん つづけて ばっちり',hint:'かきじゅんも かたちも あって「できた」を 10かい つづけよう',n:Math.min(10,w.best||0),max:10},
+        {id:'mock',label:`${L}きゅうの もぎテストで 140てん いじょう`,n:Math.min(1,mockN(14/15)),max:1}];
+  }else{
+    ms=[{id:'star2',label:`${L}きゅうの かんじを 50こ ★★に する`,n:Math.min(50,starN(4)),max:50},
+        {id:'wok',label:'かきとりで ばっちりを 200かい',hint:'かきじゅんも かたちも あって「できた」',n:Math.min(200,w.ok||0),max:200},
+        {id:'mock',label:`${L}きゅうの もぎテストで まんてん`,n:Math.min(1,mockN(1)),max:1}];
+  }
+  return ms.map(m=>Object.assign(m,{done:m.n>=m.max}));
 }
 const specialHere=area=>Zs().animals.some(x=>x.area===area&&x.key===SPECIAL[area]);
 const specialReady=area=>!specialHere(area)&&missions(area).every(m=>m.done);
@@ -4185,7 +4206,8 @@ function missionModal(area){
     <h3><span class="q">？</span>スペシャル どうぶつ</h3>
     <p>ミッションを ぜんぶ やりとげると、${AREA_NAME[area]}に なにかが やってくるよ。なにが くるかは おたのしみ！</p>
     <ol class="zmlist">${ms.map((x,i)=>`<li class="${x.done?'ok':''}"><span class="no">${x.done?'✓':i+1}</span><div><b>${x.label}</b>
-      <div class="zbar"><i style="width:${Math.round(x.n/x.max*100)}%"></i></div><small>${x.n} / ${x.max}${x.done?'　クリア！':''}</small></div></li>`).join('')}</ol>
+      ${x.hint&&!x.done?`<div class="hint">${x.hint}</div>`:''}
+      <div class="zbar"><i style="width:${Math.round(x.n/x.max*100)}%"></i></div><small>${x.max>1?`${x.n} / ${x.max}`:x.done?'':'まだ'}${x.done?'　クリア！':''}</small></div></li>`).join('')}</ol>
     <p class="muted">クリア ${n} / ${ms.length}</p></div>`;
   document.body.appendChild(m);
   m.querySelector('.close').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};
@@ -4361,7 +4383,7 @@ function drawArea(T){
   tint(T);
   for(const s of M.signs){
     const sp=s.key===SPECIAL[curArea],here=penOf(curArea,s.key);
-    const b=sp&&!here.length?drawSign(s.x,s.y,'？',`ミッション ${missions(curArea).filter(m=>m.done).length}/3`,false,15):drawSign(s.x,s.y,TITLE[s.key]||s.text,sp?'★スペシャル':null,false,15);
+    const b=sp&&!here.length?drawSign(s.x,s.y,'？',`ミッション ${missions(curArea).filter(m=>m.done).length}/${missions(curArea).length}`,false,15):drawSign(s.x,s.y,TITLE[s.key]||s.text,sp?'★スペシャル':null,false,15);
     if(here.some(x=>!fedToday(x)))bang((b.X+b.w)/K+2,b.Y/K+2,T);
     if(here.length&&z.day.poop[`${curArea}-${s.key}`])poopBadge(b.X/K-2,b.Y/K+2,T);
   }
@@ -4807,7 +4829,8 @@ function celebrate(text,sex,area,k,a){
     <button class="btn" id="zgo">けってい</button></div>`;
   document.body.appendChild(m);thumbs(m);
   m.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{$('#znm',m).value=b.dataset.n});
-  $('#zgo',m).onclick=()=>{a.name=($('#znm',m).value||'').trim().slice(0,6)||IDEAS[sex][Math.floor(Math.random()*6)];save();m.remove();open('pen',area,k,{arrive:a.id})};
+  $('#zgo',m).onclick=()=>{a.name=($('#znm',m).value||'').trim().slice(0,6)||IDEAS[sex][Math.floor(Math.random()*6)];save();m.remove();open('pen',area,k,{arrive:a.id});
+    if(sex==='b')setTimeout(arriveSpecial,1500)};   // あかちゃんで ミッションが そろったら、つづけて スペシャルが くる
 }
 
 /* ---------- どうぶつずかん ---------- */
